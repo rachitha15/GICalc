@@ -83,9 +83,46 @@ The application follows a simple Flask web service architecture with the followi
 - **Scalability**: In-memory storage may not scale for very large datasets
 - **Concurrency**: File-based approach limits concurrent write operations
 
+## API Endpoints
+
+### Core Endpoints
+- **POST** `/calculate-gl` - Calculate glycemic load for meals with AI fallback for unknown foods
+- **POST** `/parse-meal-chat` - Parse natural language meal descriptions using OpenAI GPT-4o
+- **POST** `/portion-info` - Get portion information for specific food items
+- **GET** `/health` - Health check and database status
+- **GET** `/foods` - List all available foods in the database
+
+### AI Integration Features
+- **Smart Food Recognition**: Unknown foods are automatically looked up using OpenAI GPT-4o
+- **Nutrition Estimation**: AI provides glycemic index, carbohydrates, and fiber data for unlisted foods
+- **Status Indicators**: AI-estimated foods are marked with `"status": "ai_estimated"`
+- **Fallback Logic**: Database lookup first, then AI estimation, finally "not_found" status
+
+## Recent Changes (July 27, 2025)
+
+### AI-Powered Food Database Enhancement
+- Added `get_nutrition_from_ai()` function for unknown food lookup
+- Enhanced `/calculate-gl` endpoint with intelligent AI fallback
+- Implemented OpenAI GPT-4o integration for nutrition data estimation
+- Added comprehensive validation for AI responses
+- All unknown foods now get estimated glycemic load values instead of "not_found" status
+
+### Natural Language Processing
+- Created `/parse-meal-chat` endpoint for parsing meal descriptions
+- Supports complex meal parsing like "I had 2 pooris and some rice"
+- Returns structured JSON arrays compatible with `/calculate-gl` endpoint
+- Full integration workflow: text → parse → calculate glycemic load
+
+### Portion Information Service
+- Added `/portion-info` endpoint for food serving size details
+- Provides unit and unit description information for meal planning
+- Case-insensitive food lookup with proper error handling
+
 ## Notes for Development
 
 - The application expects the food database file to be located at `attached_assets/food_items_db_1753605645874.json`
 - Case-insensitive food lookup is implemented for better user experience
-- Comprehensive error handling ensures the application continues running even if the database file is missing
+- OpenAI API key required in environment variables for AI-powered features
+- Comprehensive error handling ensures the application continues running even if external services fail
 - CORS is enabled for all routes to support frontend integration
+- AI responses are validated for data integrity and proper structure

@@ -55,6 +55,69 @@ def load_food_database():
         food_database = []
         food_lookup = {}
 
+def get_nutrition_from_ai(food_name):
+    """Get nutrition information from OpenAI for unknown food items"""
+    try:
+        if not openai_client:
+            app.logger.error("OpenAI client not available for nutrition lookup")
+            return None
+        
+        # Prepare prompt for GPT-4
+        system_prompt = """Give glycemic index (GI), carbs per unit (in grams), fiber per unit (in grams), unit, and unit_desc for one serving of the specified food item.
+Return only in JSON with keys: gi, carbs_per_unit, fiber_per_unit, unit, unit_desc.
+
+Example for 'Kheer':
+{
+  "gi": 45,
+  "carbs_per_unit": 28,
+  "fiber_per_unit": 1,
+  "unit": "bowl",
+  "unit_desc": "1 bowl = 150g, milk and rice-based sweet dish"
+}"""
+        
+        # Call OpenAI API
+        # the newest OpenAI model is "gpt-4o" which was released May 13, 2024.
+        # do not change this unless explicitly requested by the user
+        response = openai_client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": f"Get nutrition info for: {food_name}"}
+            ],
+            response_format={"type": "json_object"},
+            max_tokens=300,
+            temperature=0.3
+        )
+        
+        # Parse the response
+        gpt_response = response.choices[0].message.content
+        nutrition_data = json.loads(gpt_response)
+        
+        # Validate the response structure
+        required_keys = ['gi', 'carbs_per_unit', 'fiber_per_unit', 'unit', 'unit_desc']
+        if not all(key in nutrition_data for key in required_keys):
+            app.logger.error(f"Invalid nutrition data structure from AI: {nutrition_data}")
+            return None
+        
+        # Validate data types
+        try:
+            nutrition_data['gi'] = float(nutrition_data['gi'])
+            nutrition_data['carbs_per_unit'] = float(nutrition_data['carbs_per_unit'])
+            nutrition_data['fiber_per_unit'] = float(nutrition_data['fiber_per_unit'])
+        except (ValueError, TypeError):
+            app.logger.error(f"Invalid nutrition data types from AI: {nutrition_data}")
+            return None
+        
+        app.logger.info(f"Successfully retrieved AI nutrition data for {food_name}")
+        return nutrition_data
+        
+    except json.JSONDecodeError as e:
+        app.logger.error(f"Failed to parse AI nutrition JSON response: {e}")
+        return None
+    except Exception as e:
+        app.logger.error(f"Error getting nutrition from AI for {food_name}: {e}")
+        return None
+
 def calculate_glycemic_load(food_item, quantity):
     """Calculate glycemic load for a food item"""
     try:
@@ -149,10 +212,24 @@ def calculate_gl():
                     'gl': gl
                 })
             else:
-                items.append({
-                    'food': food_name,
-                    'status': 'not_found'
-                })
+                # Try to get nutrition info from AI
+                ai_nutrition = get_nutrition_from_ai(food_name)
+                
+                if ai_nutrition:
+                    # Calculate GL using AI-provided nutrition data
+                    gl = calculate_glycemic_load(ai_nutrition, quantity)
+                    total_gl += gl
+                    
+                    items.append({
+                        'food': food_name,
+                        'gl': gl,
+                        'status': 'ai_estimated'
+                    })
+                else:
+                    items.append({
+                        'food': food_name,
+                        'status': 'not_found'
+                    })
         
         # Return response
         response = {
