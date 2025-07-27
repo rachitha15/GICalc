@@ -103,7 +103,7 @@
     "name": "Grapes",
     "gi": 60,
     "unit": "bowl",
-    "unit_desc": "15\u201320 units",
+    "unit_desc": "15–20 units",
     "carbs_per_unit": 20,
     "fiber_per_unit": 1
   },
@@ -148,7 +148,7 @@
     "name": "Mixed Nuts",
     "gi": 20,
     "unit": "tbsp",
-    "unit_desc": "4\u20135 pieces each",
+    "unit_desc": "4–5 pieces each",
     "carbs_per_unit": 2,
     "fiber_per_unit": 1
   },
@@ -157,7 +157,7 @@
     "name": "Dried Dates",
     "gi": 60,
     "unit": "piece",
-    "unit_desc": "5\u201310g",
+    "unit_desc": "5–10g",
     "carbs_per_unit": 6,
     "fiber_per_unit": 0.8
   },
@@ -343,7 +343,7 @@
   },
   {
     "category": "Breakfast Items",
-    "name": "Dosa (cheela \u2013 lentil-based)",
+    "name": "Dosa (cheela – lentil-based)",
     "gi": 35,
     "unit": "piece",
     "unit_desc": "40g",
@@ -499,53 +499,8 @@
     "name": "Tetrapack Fruit Juice",
     "gi": 60,
     "unit": "glass",
-    "unit_desc": "250ml",
-    "carbs_per_unit": 26,
-    "fiber_per_unit": 0.2
-  },
-  {
-    "category": "Junk",
-    "name": "Ice Cream",
-    "gi": 62,
-    "unit": "scoop",
-    "unit_desc": "100g",
-    "carbs_per_unit": 22,
-    "fiber_per_unit": 0.4
-  },
-  {
-    "category": "Junk",
-    "name": "Gulab Jamun",
-    "gi": 76,
-    "unit": "piece",
-    "unit_desc": "50g with syrup",
-    "carbs_per_unit": 35,
-    "fiber_per_unit": 0.5
-  },
-  {
-    "category": "Junk",
-    "name": "Shavige Payasa",
-    "gi": 68,
-    "unit": "bowl",
-    "unit_desc": "150g",
-    "carbs_per_unit": 38,
-    "fiber_per_unit": 0.7
-  },
-  {
-    "category": "Junk",
-    "name": "Carrot Halwa",
-    "gi": 64,
-    "unit": "bowl",
-    "unit_desc": "150g",
-    "carbs_per_unit": 32,
-    "fiber_per_unit": 1.5
-  },
-  {
-    "category": "Junk",
-    "name": "Chocolate Cake",
-    "gi": 65,
-    "unit": "slice",
-    "unit_desc": "80g",
-    "carbs_per_unit": 35,
-    "fiber_per_unit": 1.2
+    "unit_desc": "200ml",
+    "carbs_per_unit": 25,
+    "fiber_per_unit": 0
   }
 ]
