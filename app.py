@@ -164,6 +164,63 @@ def calculate_gl():
             'message': 'An unexpected error occurred while processing your request'
         }), 500
 
+@app.route('/portion-info', methods=['POST'])
+def portion_info():
+    """Get portion information for a specific food item"""
+    try:
+        # Get JSON data from request
+        if not request.is_json:
+            return jsonify({
+                'error': 'Request must be JSON',
+                'message': 'Content-Type must be application/json'
+            }), 400
+        
+        data = request.get_json()
+        
+        # Validate request structure
+        if not data or 'food' not in data:
+            return jsonify({
+                'error': 'Invalid request format',
+                'message': 'Request must contain "food" field'
+            }), 400
+        
+        food_name = data['food']
+        
+        # Validate food name
+        if not food_name or not isinstance(food_name, str):
+            return jsonify({
+                'error': 'Invalid food name',
+                'message': 'Food name must be a non-empty string'
+            }), 400
+        
+        # Look up food item (case-insensitive)
+        food_name_lower = food_name.lower()
+        
+        if food_name_lower in food_lookup:
+            food_item = food_lookup[food_name_lower]
+            
+            response = {
+                'food': food_name,
+                'unit': food_item['unit'],
+                'unit_desc': food_item['unit_desc']
+            }
+            
+            return jsonify(response)
+        else:
+            response = {
+                'food': food_name,
+                'status': 'not_found'
+            }
+            
+            return jsonify(response)
+    
+    except Exception as e:
+        app.logger.error(f"Unexpected error in portion_info: {e}")
+        return jsonify({
+            'error': 'Internal server error',
+            'message': 'An unexpected error occurred while processing your request'
+        }), 500
+
 @app.route('/health', methods=['GET'])
 def health_check():
     """Health check endpoint"""
