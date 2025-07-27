@@ -1,7 +1,7 @@
 import os
 import json
 import logging
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory, send_file
 from flask_cors import CORS
 from openai import OpenAI
 
@@ -431,6 +431,27 @@ def list_foods():
         'total_foods': len(food_database),
         'foods': [{'name': item['name'], 'category': item['category']} for item in food_database]
     })
+
+# Frontend routes
+@app.route('/assets/<path:path>')
+def serve_assets(path):
+    """Serve static assets from dist/assets"""
+    return send_from_directory('dist/assets', path)
+
+@app.route('/')
+def serve_frontend():
+    """Serve the React frontend"""
+    return send_file('dist/index.html')
+
+@app.route('/<path:path>')
+def serve_spa(path):
+    """Serve React SPA - redirect all non-API routes to index.html"""
+    # Skip API routes
+    if path.startswith('api/') or path in ['health', 'foods', 'calculate-gl', 'parse-meal-chat', 'portion-info']:
+        return jsonify({'error': 'API route not found'}), 404
+    
+    # Serve the React app for all other routes
+    return send_file('dist/index.html')
 
 # Load food database on startup
 with app.app_context():
