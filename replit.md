@@ -8,6 +8,49 @@ This is an intelligent Flask-based web API that calculates glycemic load for mea
 
 Preferred communication style: Simple, everyday language.
 
+## Frontend Implementation (July 27, 2025)
+
+### Technology Stack
+- **Framework**: React 18 with TypeScript and Vite
+- **Styling**: Tailwind CSS with custom GL color scheme
+- **Architecture**: Component-based with pages and API layer separation
+
+### Frontend Structure
+```
+/src
+  /components
+    ChatInput.tsx          // Chat-style input with example meal templates
+    ParsedMealList.tsx     // Renders parsed meals with quantity inputs
+    PortionSelector.tsx    // Portion selection with backend portion info
+    GLResult.tsx           // GL results display with color coding
+    GLMeter.tsx            // Visual GL meter with traffic light colors
+  /pages
+    Home.tsx               // Main application flow and state management
+  api.ts                   // Backend API integration layer
+```
+
+### Key Features Implemented
+- **Natural Language Input**: Chat-style interface with example meal templates
+- **Smart Portion Selection**: Backend-integrated portion sizing with unit descriptions
+- **Traffic Light GL Display**: Green/yellow/red color coding for GL results
+- **Mobile Responsive**: Tailwind CSS responsive design
+- **Smooth Animations**: Fade-in and slide-up transitions
+- **AI Status Indicators**: Shows when foods are AI-estimated vs database lookup
+- **Error Handling**: Graceful fallbacks and user-friendly error messages
+
+### User Flow
+1. **Greeting**: "Let's check your meal's sugar impact"
+2. **Input**: Free-text meal description with clickable examples
+3. **Parsing**: AI converts text to structured meal data
+4. **Portions**: Interactive portion selection with backend unit info
+5. **Results**: GL calculation with visual meter and educational info
+
+### Integration
+- **Backend API**: Connects to Flask API at localhost:5000
+- **CORS Enabled**: Frontend-backend communication configured
+- **No Authentication**: Direct API access as designed
+- **Real-time**: Live portion info fetching and GL calculation
+
 ## System Architecture
 
 The application follows an intelligent Flask web service architecture with AI integration:
