@@ -3,6 +3,7 @@ import json
 import logging
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from openai import OpenAI
 
 # Configure logging for debugging
 logging.basicConfig(level=logging.DEBUG)
@@ -13,6 +14,10 @@ app.secret_key = os.environ.get("SESSION_SECRET", "default_secret_key")
 
 # Enable CORS for all routes
 CORS(app)
+
+# Initialize OpenAI client
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+openai_client = OpenAI(api_key=OPENAI_API_KEY) if OPENAI_API_KEY else None
 
 # Global variable to store food database
 food_database = {}
@@ -162,6 +167,118 @@ def calculate_gl():
         return jsonify({
             'error': 'Internal server error',
             'message': 'An unexpected error occurred while processing your request'
+        }), 500
+
+@app.route('/parse-meal-chat', methods=['POST'])
+def parse_meal_chat():
+    """Parse meal description using OpenAI GPT-4"""
+    try:
+        # Check if OpenAI is available
+        if not openai_client:
+            return jsonify({
+                'status': 'error',
+                'message': 'OpenAI API key not configured'
+            }), 500
+        
+        # Get JSON data from request
+        if not request.is_json:
+            return jsonify({
+                'error': 'Request must be JSON',
+                'message': 'Content-Type must be application/json'
+            }), 400
+        
+        data = request.get_json()
+        
+        # Validate request structure
+        if not data or 'text' not in data:
+            return jsonify({
+                'error': 'Invalid request format',
+                'message': 'Request must contain "text" field'
+            }), 400
+        
+        meal_text = data['text']
+        
+        # Validate meal text
+        if not meal_text or not isinstance(meal_text, str):
+            return jsonify({
+                'error': 'Invalid meal text',
+                'message': 'Meal text must be a non-empty string'
+            }), 400
+        
+        # Prepare prompt for GPT-4
+        system_prompt = """Parse the following Indian meal into a JSON object with a "meal" array. For each food item, return food name and approximate quantity in units. Always output in this exact format:
+
+{"meal": [
+  { "food": "Poori", "quantity": 2 },
+  { "food": "Chole Masala", "quantity": 1 },
+  { "food": "White Rice", "quantity": 0.5 }
+]}
+
+Important: Always return a JSON object with a "meal" key containing an array of food items."""
+        
+        # Call OpenAI API
+        # the newest OpenAI model is "gpt-4o" which was released May 13, 2024.
+        # do not change this unless explicitly requested by the user
+        response = openai_client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": f"Parse this meal: {meal_text}"}
+            ],
+            response_format={"type": "json_object"},
+            max_tokens=500,
+            temperature=0.3
+        )
+        
+        # Parse the response
+        gpt_response = response.choices[0].message.content
+        
+        try:
+            # Parse JSON response from GPT
+            parsed_response = json.loads(gpt_response)
+            
+            # Check if the response is a valid array format
+            if isinstance(parsed_response, dict) and 'meal' in parsed_response:
+                meal_array = parsed_response['meal']
+            elif isinstance(parsed_response, list):
+                meal_array = parsed_response
+            else:
+                # If GPT didn't return the expected format, try to extract array
+                app.logger.warning(f"Unexpected GPT response format: {parsed_response}")
+                return jsonify({
+                    'status': 'error',
+                    'message': 'Could not parse meal'
+                }), 400
+            
+            # Validate the array structure
+            if not isinstance(meal_array, list):
+                return jsonify({
+                    'status': 'error',
+                    'message': 'Could not parse meal'
+                }), 400
+            
+            # Validate each item in the array
+            for item in meal_array:
+                if not isinstance(item, dict) or 'food' not in item or 'quantity' not in item:
+                    return jsonify({
+                        'status': 'error',
+                        'message': 'Could not parse meal'
+                    }), 400
+            
+            return jsonify(meal_array)
+        
+        except json.JSONDecodeError:
+            app.logger.error(f"Failed to parse GPT JSON response: {gpt_response}")
+            return jsonify({
+                'status': 'error',
+                'message': 'Could not parse meal'
+            }), 400
+    
+    except Exception as e:
+        app.logger.error(f"Unexpected error in parse_meal_chat: {e}")
+        return jsonify({
+            'status': 'error',
+            'message': 'Could not parse meal'
         }), 500
 
 @app.route('/portion-info', methods=['POST'])
