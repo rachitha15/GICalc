@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:5000';
+const API_BASE = ''; // Use relative URLs since frontend and backend are served from same domain
 
 export interface ParsedMealItem {
   food: string;
