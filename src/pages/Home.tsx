@@ -96,32 +96,11 @@ export const Home: React.FC = () => {
         {/* Primary gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-r from-primary-600/90 via-secondary-600/90 to-primary-800/90"></div>
         
-        {/* Floating food elements */}
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-20 left-10 w-24 h-24 bg-warning-400 rounded-full mix-blend-multiply filter blur-xl animate-blob">
-            {/* Rice bowl shape */}
-            <div className="w-full h-full rounded-full border-4 border-white/30"></div>
-          </div>
-          <div className="absolute top-40 right-10 w-32 h-32 bg-success-400 rounded-full mix-blend-multiply filter blur-xl animate-blob animation-delay-2000">
-            {/* Vegetable shape */}
-            <div className="w-full h-full rounded-full border-4 border-white/30"></div>
-          </div>
-          <div className="absolute -bottom-8 left-20 w-28 h-28 bg-warning-300 rounded-full mix-blend-multiply filter blur-xl animate-blob animation-delay-4000">
-            {/* Dal/curry shape */}
-            <div className="w-full h-full rounded-full border-4 border-white/30"></div>
-          </div>
-          <div className="absolute top-1/2 left-1/4 w-20 h-20 bg-secondary-300 rounded-full mix-blend-multiply filter blur-xl animate-blob animation-delay-1000">
-            {/* Roti shape */}
-            <div className="w-full h-full rounded-full border-4 border-white/30"></div>
-          </div>
-        </div>
-        
-        {/* Geometric patterns */}
-        <div className="absolute top-0 left-0 w-full h-full">
-          <div className="absolute top-10 left-1/3 w-2 h-2 bg-white/40 rounded-full animate-pulse"></div>
-          <div className="absolute top-1/4 right-1/4 w-1 h-1 bg-white/60 rounded-full animate-bounce"></div>
-          <div className="absolute bottom-1/3 left-1/5 w-3 h-3 bg-white/30 rounded-full animate-pulse animation-delay-2000"></div>
-          <div className="absolute top-2/3 right-1/3 w-1 h-1 bg-white/50 rounded-full animate-bounce animation-delay-1000"></div>
+        {/* Simplified floating elements */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-20 left-10 w-20 h-20 bg-warning-400 rounded-full filter blur-2xl animate-blob"></div>
+          <div className="absolute top-40 right-10 w-24 h-24 bg-success-400 rounded-full filter blur-2xl animate-blob animation-delay-2000"></div>
+          <div className="absolute bottom-20 left-20 w-18 h-18 bg-secondary-400 rounded-full filter blur-2xl animate-blob animation-delay-4000"></div>
         </div>
       </div>
 
@@ -149,39 +128,30 @@ export const Home: React.FC = () => {
             </div>
           </div>
           
-          {/* Dynamic animated title */}
-          <div className="mb-6">
-            <h1 className="text-4xl md:text-5xl font-black bg-gradient-to-r from-white via-white to-white/90 bg-clip-text text-transparent mb-4 animate-slide-in leading-tight">
+          {/* Cleaner title section */}
+          <div className="mb-4">
+            <h1 className="text-5xl md:text-6xl font-black bg-gradient-to-r from-white via-white to-white/90 bg-clip-text text-transparent mb-3 animate-slide-in leading-tight">
               FoodIQ
             </h1>
-            <div className="text-xl md:text-2xl font-bold text-white/90 mb-3 animate-fade-in-delayed">
-              <span className="inline-block animate-bounce">🧠</span>
-              <span className="ml-2">Smart Meal Analysis</span>
+            <div className="text-2xl font-bold text-white/90 animate-fade-in-delayed">
+              Smart Meal Analysis
             </div>
           </div>
           
-          {/* Engaging tagline with typewriter effect */}
-          <div className="bg-white/10 backdrop-blur-sm rounded-2xl px-6 py-4 mx-auto max-w-md animate-fade-in-delayed border border-white/20">
-            <p className="text-white text-lg font-semibold flex items-center justify-center">
-              <span className="mr-2 animate-pulse">⚡</span>
+          {/* Simple tagline */}
+          <div className="bg-white/15 backdrop-blur-sm rounded-2xl px-8 py-4 mx-auto max-w-lg animate-fade-in-delayed border border-white/20">
+            <p className="text-white text-xl font-semibold text-center">
               Discover your meal's health score instantly!
-              <span className="ml-2 animate-pulse">⚡</span>
             </p>
           </div>
           
-          {/* Fun stats or badges */}
-          <div className="flex justify-center space-x-4 mt-6">
-            <div className="bg-white/15 backdrop-blur-sm rounded-xl px-4 py-2 border border-white/20">
-              <div className="text-white font-bold text-lg">56+</div>
-              <div className="text-white/80 text-xs">Indian Foods</div>
+          {/* Simplified stats badges */}
+          <div className="flex justify-center space-x-3 mt-4">
+            <div className="bg-white/20 backdrop-blur-sm rounded-2xl px-6 py-3 border border-white/30">
+              <div className="text-white font-bold text-lg">56+ Foods</div>
             </div>
-            <div className="bg-white/15 backdrop-blur-sm rounded-xl px-4 py-2 border border-white/20">
-              <div className="text-white font-bold text-lg">AI</div>
-              <div className="text-white/80 text-xs">Powered</div>
-            </div>
-            <div className="bg-white/15 backdrop-blur-sm rounded-xl px-4 py-2 border border-white/20">
-              <div className="text-white font-bold text-lg">⚡</div>
-              <div className="text-white/80 text-xs">Instant</div>
+            <div className="bg-white/20 backdrop-blur-sm rounded-2xl px-6 py-3 border border-white/30">
+              <div className="text-white font-bold text-lg">AI Powered</div>
             </div>
           </div>
         </div>

@@ -33,20 +33,9 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSubmit, isLoading = fals
     <div className="w-full space-y-8 animate-slide-up">
       {/* Revolutionary Input Experience */}
       <div className="bg-gradient-to-br from-white/95 via-white/90 to-white/85 backdrop-blur-sm rounded-3xl shadow-2xl p-8 relative overflow-hidden border border-white/20">
-        {/* Food-themed decorative elements */}
-        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-warning-200/60 to-success-200/60 rounded-full -translate-y-16 translate-x-16 opacity-80 animate-pulse">
-          {/* Rice grain pattern */}
-          <div className="absolute inset-4 bg-white/40 rounded-full"></div>
-        </div>
-        <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-success-200/60 to-secondary-200/60 rounded-full translate-y-12 -translate-x-12 opacity-80 animate-pulse animation-delay-1000">
-          {/* Vegetable pattern */}
-          <div className="absolute inset-3 bg-white/40 rounded-full"></div>
-        </div>
-        
-        {/* Floating food emojis */}
-        <div className="absolute top-4 left-4 text-2xl opacity-20 animate-bounce animation-delay-2000">🍛</div>
-        <div className="absolute top-8 right-8 text-lg opacity-20 animate-bounce animation-delay-3000">🥘</div>
-        <div className="absolute bottom-6 right-12 text-xl opacity-20 animate-bounce animation-delay-1000">🍽️</div>
+        {/* Simplified decorative elements */}
+        <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-primary-200/40 to-secondary-200/40 rounded-full -translate-y-12 translate-x-12 opacity-60"></div>
+        <div className="absolute bottom-0 left-0 w-20 h-20 bg-gradient-to-tr from-success-200/40 to-warning-200/40 rounded-full translate-y-10 -translate-x-10 opacity-60"></div>
         
         <div className="relative z-10">
           <div className="text-center mb-8 relative z-10">
@@ -54,18 +43,14 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSubmit, isLoading = fals
               <div className="w-20 h-20 bg-gradient-to-br from-primary-500 via-secondary-500 to-primary-700 rounded-full mx-auto flex items-center justify-center shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-110 animate-bounce-gentle">
                 <span className="text-3xl text-white animate-pulse">🍽️</span>
               </div>
-              {/* Sparkle effects around icon */}
-              <div className="absolute -top-1 -right-1 w-4 h-4 bg-warning-400 rounded-full animate-ping"></div>
-              <div className="absolute -bottom-1 -left-1 w-3 h-3 bg-success-400 rounded-full animate-pulse animation-delay-1000"></div>
+
             </div>
             
             <h2 className="text-3xl font-black bg-gradient-to-r from-primary-600 via-secondary-600 to-primary-800 bg-clip-text text-transparent mb-3">
               What's on your plate?
             </h2>
             <p className="text-gray-700 text-lg font-medium">
-              <span className="inline-block animate-bounce mr-2">🧠</span>
               Let AI analyze your meal's health impact
-              <span className="inline-block animate-bounce ml-2">⚡</span>
             </p>
           </div>
 
@@ -151,18 +136,14 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSubmit, isLoading = fals
               <div className="w-20 h-20 bg-gradient-to-br from-success-500 via-success-600 to-success-700 rounded-full mx-auto flex items-center justify-center shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-110 animate-bounce-gentle">
                 <span className="text-3xl text-white animate-pulse">💡</span>
               </div>
-              {/* Sparkle effects */}
-              <div className="absolute -top-1 -right-1 w-4 h-4 bg-warning-400 rounded-full animate-ping"></div>
-              <div className="absolute -bottom-1 -left-1 w-3 h-3 bg-secondary-400 rounded-full animate-pulse animation-delay-1000"></div>
+
             </div>
             
             <h3 className="text-2xl font-black bg-gradient-to-r from-success-600 via-success-700 to-success-800 bg-clip-text text-transparent mb-3">
               Try These Examples!
             </h3>
             <p className="text-gray-700 text-lg font-medium">
-              <span className="inline-block animate-bounce mr-2">👆</span>
               Tap any meal to analyze instantly
-              <span className="inline-block animate-bounce ml-2">⚡</span>
             </p>
           </div>
           
