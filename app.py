@@ -508,6 +508,10 @@ Important: Always return a JSON object with a "meal" key containing an array of 
 def get_meal_suggestions(meal_items, total_gl):
     """Get AI-powered meal improvement suggestions"""
     try:
+        # Only provide suggestions for moderate (11-19) and high (20+) GL meals
+        if total_gl < 11:
+            return []
+            
         if not openai_client:
             app.logger.error("OpenAI client not available for suggestions")
             return []
