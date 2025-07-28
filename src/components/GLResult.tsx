@@ -64,38 +64,7 @@ export const GLResult: React.FC<GLResultProps> = ({ result, onStartOver }) => {
         <GLMeter totalGL={total_gl} />
       </div>
 
-      {/* Explanation Card */}
-      <div className={`${category.cardBg} border-l-4 ${category.borderColor} rounded-r-2xl p-6`}>
-        <p className={`${category.textColor} font-medium mb-2`}>
-          {category.description}
-        </p>
-        <div className={`text-sm ${category.textColor}`}>
-          <p className="font-medium mb-1">What this means:</p>
-          <ul className="space-y-1 ml-4">
-            {total_gl <= 10 && (
-              <>
-                <li>• Low blood sugar spike expected</li>
-                <li>• Good for steady energy levels</li>
-                <li>• Suitable for diabetic-friendly meals</li>
-              </>
-            )}
-            {total_gl > 10 && total_gl <= 20 && (
-              <>
-                <li>• Moderate blood sugar rise</li>
-                <li>• Add protein or healthy fats to balance</li>
-                <li>• Monitor portion sizes</li>
-              </>
-            )}
-            {total_gl > 20 && (
-              <>
-                <li>• Significant blood sugar impact</li>
-                <li>• Consider reducing portions</li>
-                <li>• Pair with protein, fiber, or healthy fats</li>
-              </>
-            )}
-          </ul>
-        </div>
-      </div>
+
 
       {/* Food Breakdown */}
       <div className="bg-white rounded-2xl shadow-lg p-6">
