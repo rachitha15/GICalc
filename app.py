@@ -108,7 +108,7 @@ Example for 'Kheer':
             app.logger.error(f"Invalid nutrition data types from AI: {nutrition_data}")
             return None
         
-        app.logger.info(f"Successfully retrieved AI nutrition data for {food_name}")
+        app.logger.info(f"Successfully retrieved AI nutrition data for {food_name}: GI={nutrition_data['gi']}, Carbs={nutrition_data['carbs_per_unit']}, Fiber={nutrition_data['fiber_per_unit']}")
         return nutrition_data
         
     except json.JSONDecodeError as e:
@@ -295,6 +295,8 @@ Use these specific food name mappings for common items:
 - "chole" → "Chole Masala"
 - "rajma" → "Rajma"
 - "poori" → "Poori"
+- "chicken curry" → "Chicken Dish (homemade)"
+- "chicken" → "Chicken Dish (homemade)"
 
 Return JSON with "meal" key containing array of objects with "food" and "quantity" keys.
 Examples:
