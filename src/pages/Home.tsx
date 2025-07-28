@@ -84,65 +84,114 @@ export const Home: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 px-4 py-6">
-      <div className="max-w-md mx-auto sm:max-w-lg">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 px-4 py-6 relative overflow-hidden">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 opacity-10">
+        <div className="absolute top-20 left-10 w-32 h-32 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl animate-blob"></div>
+        <div className="absolute top-40 right-10 w-32 h-32 bg-yellow-300 rounded-full mix-blend-multiply filter blur-xl animate-blob animation-delay-2000"></div>
+        <div className="absolute -bottom-8 left-20 w-32 h-32 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl animate-blob animation-delay-4000"></div>
+      </div>
+
+      <div className="max-w-md mx-auto sm:max-w-lg relative z-10">
         {/* Header */}
-        <div className="text-center mb-8">
-          <div className="bg-white rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center shadow-md">
-            <span className="text-2xl">🍽️</span>
+        <div className="text-center mb-8 animate-fade-in-up">
+          <div className="relative mb-6">
+            <div className="bg-gradient-to-br from-white to-gray-50 rounded-3xl w-20 h-20 mx-auto flex items-center justify-center shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-110 hover:rotate-12">
+              <span className="text-3xl animate-bounce-gentle">🍽️</span>
+            </div>
+            <div className="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-r from-green-400 to-blue-500 rounded-full animate-pulse shadow-lg"></div>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 bg-clip-text text-transparent mb-3 animate-slide-in">
             Glycemic Load Tracker
           </h1>
-          <p className="text-gray-600">
-            Check your meal's sugar impact
+          <p className="text-gray-600 text-lg font-medium animate-fade-in-delayed">
+            ✨ Discover your meal's blood sugar impact
           </p>
         </div>
 
         {/* Error Display */}
         {error && (
-          <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-400 rounded-r-lg text-red-700">
-            <div className="flex items-center space-x-2">
-              <span>❌</span>
-              <span>{error}</span>
+          <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-400 rounded-r-2xl text-red-700 animate-shake shadow-lg">
+            <div className="flex items-center space-x-3">
+              <div className="flex-shrink-0">
+                <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+                  <span className="text-red-500">⚠️</span>
+                </div>
+              </div>
+              <span className="font-medium">{error}</span>
             </div>
           </div>
         )}
 
-        {/* Main Content */}
-        {appState === 'input' && (
-          <ChatInput onSubmit={handleMealSubmit} isLoading={isLoading} />
-        )}
+        {/* Main Content with smooth transitions */}
+        <div className={`transition-all duration-500 ease-in-out ${
+          isLoading ? 'opacity-70 scale-95 pointer-events-none' : 'opacity-100 scale-100'
+        }`}>
+          {appState === 'input' && (
+            <div className="animate-slide-up">
+              <ChatInput onSubmit={handleMealSubmit} isLoading={isLoading} />
+            </div>
+          )}
 
-        {appState === 'disambiguation' && (
-          <FoodDisambiguation
-            items={disambiguationItems}
-            onSelectionComplete={handleDisambiguationComplete}
-          />
-        )}
+          {appState === 'disambiguation' && (
+            <div className="animate-slide-up">
+              <FoodDisambiguation
+                items={disambiguationItems}
+                onSelectionComplete={handleDisambiguationComplete}
+              />
+            </div>
+          )}
 
-        {appState === 'portions' && (
-          <ParsedMealList
-            parsedMeal={parsedMeal}
-            onQuantityChange={handleQuantityChange}
-            onConfirm={handleCalculateGL}
-            isLoading={isLoading}
-          />
-        )}
+          {appState === 'portions' && (
+            <div className="animate-slide-up">
+              <ParsedMealList
+                parsedMeal={parsedMeal}
+                onQuantityChange={handleQuantityChange}
+                onConfirm={handleCalculateGL}
+                isLoading={isLoading}
+              />
+            </div>
+          )}
 
-        {appState === 'results' && glResult && (
-          <GLResult result={glResult} onStartOver={handleStartOver} />
-        )}
+          {appState === 'results' && glResult && (
+            <div className="animate-zoom-in">
+              <GLResult result={glResult} onStartOver={handleStartOver} />
+            </div>
+          )}
+        </div>
 
-        {/* Back Button for portions and disambiguation views */}
+        {/* Floating Back Button */}
         {(appState === 'portions' || appState === 'disambiguation') && (
-          <div className="mt-6 text-center">
+          <div className="mt-8 text-center animate-fade-in-delayed">
             <button
               onClick={handleStartOver}
-              className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+              className="group px-6 py-3 bg-white/80 backdrop-blur-sm text-gray-600 hover:text-gray-800 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 border border-white/20"
             >
-              ← Start over
+              <span className="flex items-center space-x-2">
+                <span className="group-hover:-translate-x-1 transition-transform duration-200">←</span>
+                <span className="font-medium">Start over</span>
+              </span>
             </button>
+          </div>
+        )}
+
+        {/* Loading Overlay */}
+        {isLoading && (
+          <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in">
+            <div className="bg-white/95 backdrop-blur-sm rounded-3xl p-8 shadow-2xl animate-bounce-in max-w-sm mx-4">
+              <div className="flex flex-col items-center space-y-4">
+                <div className="relative">
+                  <div className="w-16 h-16 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin"></div>
+                  <div className="absolute inset-0 w-16 h-16 border-4 border-transparent border-r-blue-600 rounded-full animate-spin-reverse"></div>
+                </div>
+                <p className="text-gray-700 font-semibold text-lg">Analyzing your meal...</p>
+                <div className="flex space-x-1">
+                  <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce"></div>
+                  <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce animation-delay-100"></div>
+                  <div className="w-2 h-2 bg-indigo-500 rounded-full animate-bounce animation-delay-200"></div>
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </div>

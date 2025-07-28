@@ -191,6 +191,25 @@ The application follows an intelligent Flask web service architecture with AI in
 - **Portion Guidance**: Includes specific portion modifications and combinations
 - **Educational Reasoning**: Each suggestion explains WHY it helps (GL reduction, fiber addition, etc.)
 - **Customizable Prompt**: Fully editable AI prompt system for precise recommendation control
+- **Smart Threshold**: Only shows suggestions for GL ≥ 11 (moderate/high impact meals)
+
+### Complete UX/UI Revamp (July 28, 2025)
+- **Engaging Home Screen**: Animated gradient backgrounds, floating elements, interactive icons
+- **Dynamic Result Animations**: Celebration effects for low GL, warning animations for high GL
+- **Enhanced GL Meter**: Animated gradient bar with floating tooltips and status messages
+- **Improved Food Selection**: Better spacing, gradient backgrounds, clear visual feedback
+- **Customer Delight Elements**: 
+  - Success celebrations (🎉 for low GL with particles and glow effects)
+  - Warning indicators (🚨 for high GL with shake animations)
+  - Smooth transitions and hover effects throughout
+  - Loading overlays with animated spinners
+- **Modern Design System**: 
+  - Rounded corners (rounded-3xl), gradient backgrounds, shadow-2xl
+  - Purple/blue gradient color scheme
+  - Backdrop blur effects and glassmorphism
+  - Custom animations (bounce-gentle, celebration, warning-shake)
+- **Removed Generic Content**: Eliminated old hardcoded "consider adding protein/fiber" text
+- **Clear GL Scale**: Enhanced meter with descriptive labels (Excellent/Low/Moderate/High)
 
 ## Implementation Summary (July 27, 2025)
 

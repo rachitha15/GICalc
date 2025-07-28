@@ -91,23 +91,34 @@ export const FoodDisambiguation: React.FC<FoodDisambiguationProps> = ({
               )}
 
               {item.status === 'needs_disambiguation' && (
-                <div className="space-y-2">
+                <div className="space-y-4">
                   {item.matches.map((match, matchIndex) => (
-                    <label key={matchIndex} className="flex items-center space-x-3 cursor-pointer">
+                    <label key={matchIndex} className={`flex items-start space-x-4 p-4 rounded-xl cursor-pointer border-2 transition-all duration-200 hover:scale-[1.02] ${
+                      selections[item.original_name] === match.name
+                        ? 'bg-gradient-to-r from-blue-50 to-purple-50 border-blue-300 shadow-lg'
+                        : 'bg-gray-50 border-gray-200 hover:bg-white hover:border-gray-300 hover:shadow-md'
+                    }`}>
                       <input
                         type="radio"
                         name={`food_${index}`}
                         value={match.name}
                         checked={selections[item.original_name] === match.name}
                         onChange={() => handleSelection(item.original_name, match.name)}
-                        className="text-blue-600 focus:ring-blue-500"
+                        className="mt-1 w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300"
                       />
                       <div className="flex-1">
-                        <div className="font-medium text-gray-900">{match.name}</div>
-                        <div className="text-sm text-gray-600">
-                          {match.category} • {match.unit_desc}
+                        <div className="font-semibold text-gray-900 text-lg mb-2">{match.name}</div>
+                        <div className="text-sm text-gray-600 flex items-center space-x-2">
+                          <span className="bg-gray-100 px-3 py-1 rounded-full font-medium">{match.category}</span>
+                          <span>•</span>
+                          <span>{match.unit_desc}</span>
                         </div>
                       </div>
+                      {selections[item.original_name] === match.name && (
+                        <div className="text-blue-600 animate-bounce text-xl">
+                          ✓
+                        </div>
+                      )}
                     </label>
                   ))}
                 </div>

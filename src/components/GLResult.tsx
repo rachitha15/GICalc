@@ -41,27 +41,98 @@ export const GLResult: React.FC<GLResultProps> = ({ result, onStartOver }) => {
 
   return (
     <div className="w-full space-y-6">
-      {/* Result Header */}
-      <div className="bg-white rounded-2xl shadow-lg p-6 text-center">
-        <div className="mb-4">
-          <div className={`${category.bgColor} rounded-full w-16 h-16 mx-auto mb-3 flex items-center justify-center`}>
-            <span className="text-2xl">
-              {total_gl <= 10 ? '✓' : total_gl <= 20 ? '⚠️' : '⚠️'}
-            </span>
-          </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            Your Meal's Impact
-          </h2>
+      {/* Result Header with Dynamic Animations */}
+      <div className={`bg-gradient-to-br from-white to-gray-50 rounded-3xl shadow-2xl p-8 text-center relative overflow-hidden ${
+        total_gl <= 10 ? 'animate-success-bounce' : 
+        total_gl > 20 ? 'animate-warning-shake' : ''
+      }`}>
+        {/* Background decoration */}
+        <div className="absolute inset-0 opacity-5">
+          {total_gl <= 10 && (
+            <div className="absolute inset-0 bg-green-400 animate-pulse"></div>
+          )}
+          {total_gl > 20 && (
+            <div className="absolute inset-0 bg-red-400 animate-pulse"></div>
+          )}
         </div>
         
-        <div className="mb-6">
-          <div className="text-4xl font-bold text-gray-900 mb-2">{total_gl.toFixed(1)}</div>
-          <div className={`inline-block px-4 py-2 rounded-full font-semibold text-sm ${category.bgColor} ${category.textColor}`}>
-            {category.label} Glycemic Load
+        {/* Floating particles for low GL */}
+        {total_gl <= 10 && (
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute top-4 left-4 w-2 h-2 bg-green-400 rounded-full animate-bounce opacity-60"></div>
+            <div className="absolute top-8 right-8 w-1 h-1 bg-green-500 rounded-full animate-bounce animation-delay-200 opacity-60"></div>
+            <div className="absolute bottom-6 left-12 w-2 h-2 bg-emerald-400 rounded-full animate-bounce animation-delay-100 opacity-60"></div>
           </div>
-        </div>
+        )}
         
-        <GLMeter totalGL={total_gl} />
+        {/* Warning indicators for high GL */}
+        {total_gl > 20 && (
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute top-4 right-4 text-red-400 animate-pulse text-xl">⚠️</div>
+            <div className="absolute bottom-4 left-4 text-orange-400 animate-pulse text-lg">🔥</div>
+          </div>
+        )}
+
+        <div className="relative z-10">
+          <div className="mb-6">
+            {/* Dynamic Icon with Celebration */}
+            <div className={`relative mx-auto mb-4 ${
+              total_gl <= 10 ? 'animate-celebration' : 
+              total_gl > 20 ? 'animate-warning-shake' : 'animate-bounce-gentle'
+            }`}>
+              <div className={`${category.bgColor} rounded-full w-20 h-20 mx-auto flex items-center justify-center shadow-xl border-4 ${
+                total_gl <= 10 ? 'border-green-200' : 
+                total_gl > 20 ? 'border-red-200' : 'border-yellow-200'
+              }`}>
+                <span className="text-3xl">
+                  {total_gl <= 10 ? '🎉' : total_gl <= 20 ? '⚠️' : '🚨'}
+                </span>
+              </div>
+              {/* Glow effect for low GL */}
+              {total_gl <= 10 && (
+                <div className="absolute inset-0 rounded-full bg-green-400 opacity-20 animate-ping"></div>
+              )}
+            </div>
+            
+            <h2 className="text-3xl font-bold text-gray-900 mb-4 animate-fade-in-up">
+              {total_gl <= 10 ? '🌟 Excellent Choice!' : 
+               total_gl <= 20 ? 'Your Meal\'s Impact' : '⚠️ High Impact Alert'}
+            </h2>
+          </div>
+          
+          <div className="mb-8">
+            <div className={`text-5xl font-bold mb-3 animate-zoom-in ${
+              total_gl <= 10 ? 'text-green-600' : 
+              total_gl > 20 ? 'text-red-600' : 'text-yellow-600'
+            }`}>
+              {total_gl.toFixed(1)}
+            </div>
+            <div className={`inline-block px-6 py-3 rounded-full font-bold text-base shadow-lg ${category.bgColor} ${category.textColor} animate-bounce-in`}>
+              {category.label} Glycemic Load
+            </div>
+            
+            {/* Dynamic messages */}
+            <div className="mt-4 animate-fade-in-delayed">
+              {total_gl <= 10 && (
+                <p className="text-green-700 font-semibold text-lg">
+                  🎯 Perfect for steady energy levels!
+                </p>
+              )}
+              {total_gl > 10 && total_gl <= 20 && (
+                <p className="text-yellow-700 font-semibold text-lg">
+                  ⚖️ Moderate impact - check the suggestions below
+                </p>
+              )}
+              {total_gl > 20 && (
+                <p className="text-red-700 font-semibold text-lg">
+                  🚨 High impact - see improvement tips below
+                </p>
+              )}
+            </div>
+          </div>
+          
+          <GLMeter totalGL={total_gl} />
+        </div>
       </div>
 
 
