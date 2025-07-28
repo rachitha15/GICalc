@@ -40,6 +40,23 @@ export const api = {
     return response.json();
   },
 
+  // Smart meal parsing with database disambiguation
+  async parseMealSmart(text: string) {
+    const response = await fetch(`${API_BASE}/parse-meal-smart`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ text }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to parse meal: ${response.statusText}`);
+    }
+
+    return response.json();
+  },
+
   // Get portion information for a specific food
   async getPortionInfo(food: string): Promise<PortionInfo> {
     const response = await fetch(`${API_BASE}/portion-info`, {

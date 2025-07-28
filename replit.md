@@ -164,6 +164,26 @@ The application follows an intelligent Flask web service architecture with AI in
 - **Status Indicators**: AI-estimated foods are marked with `"status": "ai_estimated"`
 - **Fallback Logic**: Database lookup first, then AI estimation, finally "not_found" status
 
+## Latest Updates (July 28, 2025)
+
+### Smart Food Disambiguation System
+- **New /parse-meal-smart endpoint**: Intelligent food parsing with database lookup
+- **FoodDisambiguation component**: UI for user to choose between multiple database matches
+- **Enhanced user flow**: Input → Disambiguation → Portions → Results
+- **Database-first approach**: Prioritizes curated data over AI estimation
+
+### User Experience Improvements
+- **Better food matching**: "chicken" finds both "Chicken Dish (homemade)" and "Chicken Dish (restaurant)"
+- **User choice**: System asks user to pick specific database entries instead of assuming
+- **AI fallback**: Unknown foods (like "pasta") automatically use AI estimation
+- **Status indicators**: Clear labeling of database vs AI-estimated foods
+
+### Technical Implementation
+- **Smart parsing logic**: Partial string matching to find database candidates
+- **Three-state system**: single_match, needs_disambiguation, needs_ai
+- **Improved accuracy**: Users get precise nutrition data from curated database
+- **Reduced AI dependency**: Less reliance on potentially inaccurate AI estimates
+
 ## Implementation Summary (July 27, 2025)
 
 ### Core Functionality Delivered

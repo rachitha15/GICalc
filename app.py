@@ -371,6 +371,136 @@ Important: Always return a JSON object with a "meal" key containing an array of 
             'message': 'Could not parse meal'
         }), 500
 
+@app.route('/parse-meal-smart', methods=['POST'])
+def parse_meal_smart():
+    """Smart meal parsing with database disambiguation"""
+    try:
+        # Check if OpenAI is available
+        if not openai_client:
+            return jsonify({
+                'status': 'error',
+                'message': 'OpenAI API key not configured'
+            }), 500
+        
+        # Get JSON data from request
+        if not request.is_json:
+            return jsonify({
+                'error': 'Request must be JSON',
+                'message': 'Content-Type must be application/json'
+            }), 400
+        
+        data = request.get_json()
+        
+        # Validate request structure
+        if not data or 'text' not in data:
+            return jsonify({
+                'error': 'Invalid request format',
+                'message': 'Request must contain "text" field'
+            }), 400
+        
+        meal_text = data['text']
+        
+        # Validate meal text
+        if not meal_text or not isinstance(meal_text, str):
+            return jsonify({
+                'error': 'Invalid meal text',
+                'message': 'Meal text must be a non-empty string'
+            }), 400
+        
+        # Simple parsing prompt - just extract food names and quantities
+        system_prompt = """Parse meal descriptions into structured JSON format.
+        
+Extract food items and their quantities from the input text.
+Use common food names without specific mapping - just extract what the user mentioned.
+
+Return JSON with "meal" key containing array of objects with "food" and "quantity" keys.
+Examples:
+"2 pooris and chole" → {"meal": [{"food": "Poori", "quantity": 2}, {"food": "Chole", "quantity": 1}]}
+"rice and dal" → {"meal": [{"food": "Rice", "quantity": 1}, {"food": "Dal", "quantity": 1}]}
+"chicken curry and rice" → {"meal": [{"food": "Chicken", "quantity": 1}, {"food": "Rice", "quantity": 1}]}
+
+Important: Always return a JSON object with a "meal" key containing an array of food items."""
+        
+        # Call OpenAI API for basic parsing
+        response = openai_client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": f"Parse this meal: {meal_text}"}
+            ],
+            response_format={"type": "json_object"},
+            max_tokens=500,
+            temperature=0.3
+        )
+        
+        # Parse the response
+        gpt_response = response.choices[0].message.content
+        parsed_response = json.loads(gpt_response)
+        
+        if 'meal' not in parsed_response:
+            return jsonify({
+                'status': 'error',
+                'message': 'Could not parse meal'
+            }), 400
+        
+        meal_array = parsed_response['meal']
+        result_items = []
+        
+        # Check each food item for database matches
+        for item in meal_array:
+            food_name = item['food'].lower()
+            quantity = item['quantity']
+            
+            # Find potential matches in database
+            matches = []
+            for db_food in food_database:
+                db_name_lower = db_food['name'].lower()
+                # Check for partial matches (chicken matches "chicken dish")
+                if food_name in db_name_lower or any(word in db_name_lower for word in food_name.split()):
+                    matches.append({
+                        'name': db_food['name'],
+                        'category': db_food['category'],
+                        'unit_desc': db_food['unit_desc']
+                    })
+            
+            if len(matches) == 0:
+                # No database matches - will need AI estimation
+                result_items.append({
+                    'original_name': item['food'],
+                    'quantity': quantity,
+                    'status': 'needs_ai',
+                    'matches': []
+                })
+            elif len(matches) == 1:
+                # Single match - use it directly
+                result_items.append({
+                    'original_name': item['food'],
+                    'quantity': quantity,
+                    'status': 'single_match',
+                    'selected_food': matches[0]['name'],
+                    'matches': matches
+                })
+            else:
+                # Multiple matches - need user disambiguation
+                result_items.append({
+                    'original_name': item['food'],
+                    'quantity': quantity,
+                    'status': 'needs_disambiguation',
+                    'matches': matches
+                })
+        
+        return jsonify({
+            'status': 'success',
+            'items': result_items
+        })
+        
+    except Exception as e:
+        app.logger.error(f"Unexpected error in parse_meal_smart: {e}")
+        return jsonify({
+            'status': 'error',
+            'message': 'Could not parse meal'
+        }), 500
+
 @app.route('/portion-info', methods=['POST'])
 def portion_info():
     """Get portion information for a specific food item"""

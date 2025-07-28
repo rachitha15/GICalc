@@ -2,13 +2,15 @@ import React, { useState } from 'react';
 import { ChatInput } from '../components/ChatInput';
 import { ParsedMealList } from '../components/ParsedMealList';
 import { GLResult } from '../components/GLResult';
+import { FoodDisambiguation } from '../components/FoodDisambiguation';
 import { api, ParsedMealItem, GLCalculationResult } from '../api';
 
-type AppState = 'input' | 'portions' | 'results';
+type AppState = 'input' | 'disambiguation' | 'portions' | 'results';
 
 export const Home: React.FC = () => {
   const [appState, setAppState] = useState<AppState>('input');
   const [parsedMeal, setParsedMeal] = useState<ParsedMealItem[]>([]);
+  const [disambiguationItems, setDisambiguationItems] = useState<any[]>([]);
   const [glResult, setGLResult] = useState<GLCalculationResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -18,14 +20,38 @@ export const Home: React.FC = () => {
       setIsLoading(true);
       setError(null);
       
-      const parsed = await api.parseMealChat(text);
-      setParsedMeal(parsed);
-      setAppState('portions');
+      const result = await api.parseMealSmart(text);
+      if (result.status === 'success') {
+        // Check if any items need disambiguation
+        const needsDisambiguation = result.items.some((item: any) => 
+          item.status === 'needs_disambiguation'
+        );
+        
+        if (needsDisambiguation) {
+          setDisambiguationItems(result.items);
+          setAppState('disambiguation');
+        } else {
+          // Convert to parsed meal format and go to portions
+          const finalMeal = result.items.map((item: any) => ({
+            food: item.status === 'single_match' ? item.selected_food : item.original_name,
+            quantity: item.quantity
+          }));
+          setParsedMeal(finalMeal);
+          setAppState('portions');
+        }
+      } else {
+        setError('Failed to parse meal');
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to parse meal');
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleDisambiguationComplete = (selectedMeal: ParsedMealItem[]) => {
+    setParsedMeal(selectedMeal);
+    setAppState('portions');
   };
 
   const handleQuantityChange = (index: number, quantity: number) => {
@@ -52,6 +78,7 @@ export const Home: React.FC = () => {
   const handleStartOver = () => {
     setAppState('input');
     setParsedMeal([]);
+    setDisambiguationItems([]);
     setGLResult(null);
     setError(null);
   };
@@ -87,6 +114,13 @@ export const Home: React.FC = () => {
           <ChatInput onSubmit={handleMealSubmit} isLoading={isLoading} />
         )}
 
+        {appState === 'disambiguation' && (
+          <FoodDisambiguation
+            items={disambiguationItems}
+            onSelectionComplete={handleDisambiguationComplete}
+          />
+        )}
+
         {appState === 'portions' && (
           <ParsedMealList
             parsedMeal={parsedMeal}
@@ -100,8 +134,8 @@ export const Home: React.FC = () => {
           <GLResult result={glResult} onStartOver={handleStartOver} />
         )}
 
-        {/* Back Button for portions view */}
-        {appState === 'portions' && (
+        {/* Back Button for portions and disambiguation views */}
+        {(appState === 'portions' || appState === 'disambiguation') && (
           <div className="mt-6 text-center">
             <button
               onClick={handleStartOver}
