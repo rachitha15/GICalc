@@ -77,14 +77,14 @@ export const Home: React.FC = () => {
         </div>
 
         <div className="max-w-2xl mx-auto text-center relative z-10">
-          <h1 className="text-6xl font-black text-white mb-4 animate-fade-in">
+          <h1 className="text-6xl font-black mb-4 animate-fade-in" style={{color: '#ffffff'}}>
             FoodIQ
           </h1>
-          <p className="text-2xl font-bold text-white/90 mb-6 animate-fade-in-delayed">
+          <p className="text-2xl font-bold mb-6 animate-fade-in-delayed" style={{color: 'rgba(255, 255, 255, 0.9)'}}>
             Smart Meal Analysis
           </p>
           <div className="bg-white/20 backdrop-blur-sm rounded-2xl px-8 py-4 inline-block border border-white/30">
-            <p className="text-white text-xl font-semibold">
+            <p className="text-xl font-semibold" style={{color: '#ffffff'}}>
               Discover your meal's health score instantly!
             </p>
           </div>
@@ -92,10 +92,10 @@ export const Home: React.FC = () => {
           {/* Stats badges */}
           <div className="flex justify-center space-x-4 mt-8">
             <div className="bg-white/20 backdrop-blur-sm rounded-2xl px-6 py-3 border border-white/30">
-              <div className="text-white font-bold text-lg">56+ Foods</div>
+              <div className="font-bold text-lg" style={{color: '#ffffff'}}>56+ Foods</div>
             </div>
             <div className="bg-white/20 backdrop-blur-sm rounded-2xl px-6 py-3 border border-white/30">
-              <div className="text-white font-bold text-lg">AI Powered</div>
+              <div className="font-bold text-lg" style={{color: '#ffffff'}}>AI Powered</div>
             </div>
           </div>
         </div>
