@@ -282,14 +282,25 @@ def parse_meal_chat():
                 'message': 'Meal text must be a non-empty string'
             }), 400
         
-        # Prepare prompt for GPT-4
-        system_prompt = """Parse the following Indian meal into a JSON object with a "meal" array. For each food item, return food name and approximate quantity in units. Always output in this exact format:
+        # Enhanced prompt with better food name mapping
+        system_prompt = """Parse meal descriptions into structured JSON format.
 
-{"meal": [
-  { "food": "Poori", "quantity": 2 },
-  { "food": "Chole Masala", "quantity": 1 },
-  { "food": "White Rice", "quantity": 0.5 }
-]}
+Use these specific food name mappings for common items:
+- "rice" → "White Rice"
+- "basmati rice" → "Basmati Rice" 
+- "brown rice" → "Brown Rice"
+- "roti" → "Roti"
+- "chapati" → "Roti"
+- "dal" → "Dal"
+- "chole" → "Chole Masala"
+- "rajma" → "Rajma"
+- "poori" → "Poori"
+
+Return JSON with "meal" key containing array of objects with "food" and "quantity" keys.
+Examples:
+"2 pooris and chole" → {"meal": [{"food": "Poori", "quantity": 2}, {"food": "Chole Masala", "quantity": 1}]}
+"rice and dal" → {"meal": [{"food": "White Rice", "quantity": 1}, {"food": "Dal", "quantity": 1}]}
+"chicken curry and rice" → {"meal": [{"food": "Chicken Curry", "quantity": 1}, {"food": "White Rice", "quantity": 1}]}
 
 Important: Always return a JSON object with a "meal" key containing an array of food items."""
         

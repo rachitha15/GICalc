@@ -29,5 +29,19 @@ export default {
       }
     },
   },
+  safelist: [
+    'bg-green-50',
+    'bg-green-100',
+    'bg-yellow-50', 
+    'bg-yellow-100',
+    'bg-red-50',
+    'bg-red-100',
+    'text-green-800',
+    'text-yellow-800', 
+    'text-red-800',
+    'border-green-400',
+    'border-yellow-400',
+    'border-red-400',
+  ],
   plugins: [],
 }

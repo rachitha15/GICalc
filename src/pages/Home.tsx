@@ -57,8 +57,8 @@ export const Home: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      <div className="max-w-md mx-auto px-4 py-6 sm:max-w-lg">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 px-4 py-6">
+      <div className="max-w-md mx-auto sm:max-w-lg">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="bg-white rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center shadow-md">
