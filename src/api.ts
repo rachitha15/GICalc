@@ -17,9 +17,15 @@ export interface GLCalculationItem {
   status?: 'ai_estimated';
 }
 
+export interface MealSuggestion {
+  text: string;
+  reason: string;
+}
+
 export interface GLCalculationResult {
   total_gl: number;
   items: GLCalculationItem[];
+  suggestions?: MealSuggestion[];
 }
 
 export const api = {

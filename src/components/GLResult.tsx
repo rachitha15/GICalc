@@ -118,6 +118,66 @@ export const GLResult: React.FC<GLResultProps> = ({ result, onStartOver }) => {
         </div>
       </div>
 
+      {/* AI-Powered Suggestions */}
+      {result.suggestions && result.suggestions.length > 0 && (
+        <div className="bg-white rounded-2xl shadow-lg p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            💡 Smart Suggestions
+          </h3>
+          <div className="space-y-4">
+            {result.suggestions.map((suggestion, index) => (
+              <div key={index} className="border-l-4 border-blue-400 pl-4 py-2">
+                <p className="text-gray-900 font-medium mb-1">{suggestion.text}</p>
+                <p className="text-sm text-gray-600">{suggestion.reason}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Fallback recommendations if no AI suggestions */}
+      {(!result.suggestions || result.suggestions.length === 0) && (
+        <div className="bg-white rounded-2xl shadow-lg p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            💡 Quick Tips
+          </h3>
+          <div className="space-y-3">
+            {result.total_gl > 20 ? (
+              <>
+                <div className="flex items-start space-x-3">
+                  <div className="w-2 h-2 bg-red-400 rounded-full mt-2 flex-shrink-0"></div>
+                  <p className="text-gray-700">Consider smaller portions to reduce impact</p>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <div className="w-2 h-2 bg-red-400 rounded-full mt-2 flex-shrink-0"></div>
+                  <p className="text-gray-700">Add vegetables or salad to slow absorption</p>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <div className="w-2 h-2 bg-red-400 rounded-full mt-2 flex-shrink-0"></div>
+                  <p className="text-gray-700">Pair with protein, fiber, or healthy fats</p>
+                </div>
+              </>
+            ) : result.total_gl > 10 ? (
+              <>
+                <div className="flex items-start space-x-3">
+                  <div className="w-2 h-2 bg-yellow-400 rounded-full mt-2 flex-shrink-0"></div>
+                  <p className="text-gray-700">Good balance - consider adding more vegetables</p>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <div className="w-2 h-2 bg-yellow-400 rounded-full mt-2 flex-shrink-0"></div>
+                  <p className="text-gray-700">Pair with protein, fiber, or healthy fats</p>
+                </div>
+              </>
+            ) : (
+              <div className="flex items-start space-x-3">
+                <div className="w-2 h-2 bg-green-400 rounded-full mt-2 flex-shrink-0"></div>
+                <p className="text-gray-700">Great low-impact choice! This meal will have minimal effect on blood sugar.</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Action Buttons */}
       <div className="space-y-3">
         <button

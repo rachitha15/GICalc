@@ -231,10 +231,14 @@ def calculate_gl():
                         'status': 'not_found'
                     })
         
+        # Get AI suggestions for meal improvement
+        suggestions = get_meal_suggestions(items, total_gl)
+        
         # Return response
         response = {
             'total_gl': round(total_gl, 2),
-            'items': items
+            'items': items,
+            'suggestions': suggestions
         }
         
         return jsonify(response)
@@ -500,6 +504,76 @@ Important: Always return a JSON object with a "meal" key containing an array of 
             'status': 'error',
             'message': 'Could not parse meal'
         }), 500
+
+def get_meal_suggestions(meal_items, total_gl):
+    """Get AI-powered meal improvement suggestions"""
+    try:
+        if not openai_client:
+            app.logger.error("OpenAI client not available for suggestions")
+            return []
+        
+        # Build meal description for AI
+        meal_description = []
+        for item in meal_items:
+            food_name = item['food']
+            gl = item['gl']
+            status = item.get('status', 'database')
+            meal_description.append(f"- {food_name}: GL {gl:.1f} ({'AI estimated' if status == 'ai_estimated' else 'database'})")
+        
+        meal_text = '\n'.join(meal_description)
+        
+        # Customizable prompt for meal suggestions
+        system_prompt = """You are a nutrition expert providing specific meal improvement suggestions for glycemic load management.
+
+Given a meal with its glycemic load (GL) breakdown, provide 3-4 actionable suggestions to improve the meal's impact on blood sugar.
+
+GUIDELINES:
+- Focus on SPECIFIC food swaps, not generic advice
+- Consider the actual foods in the meal
+- Suggest specific Indian foods from common diet when possible
+- Include portion modifications, not just food substitutions
+- Explain WHY each suggestion helps (GL reduction, fiber addition, etc.)
+- Be concise but specific
+
+GL RANGES:
+- Low GL (0-10): Minimal impact, maintain or optimize
+- Medium GL (11-19): Moderate impact, some improvements beneficial  
+- High GL (20+): Significant impact, prioritize reductions
+
+MEAL TO ANALYZE:
+{meal_text}
+Total GL: {total_gl}
+
+Return ONLY valid JSON with "suggestions" array containing objects with "text" and "reason" keys. Do not include any other text or formatting.
+
+Example response:
+{{"suggestions": [{{"text": "Replace white rice with brown rice or reduce portion by half", "reason": "Cuts GL by ~40% due to higher fiber and smaller portion"}}, {{"text": "Add 1 cup mixed salad with cucumber and tomatoes before eating", "reason": "Fiber slows glucose absorption, reducing overall meal impact"}}]}}"""
+        
+        # Call OpenAI API
+        response = openai_client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": system_prompt.format(meal_text=meal_text, total_gl=total_gl)},
+                {"role": "user", "content": f"Provide specific improvement suggestions for this meal with total GL of {total_gl:.1f}"}
+            ],
+            response_format={"type": "json_object"},
+            max_tokens=800,
+            temperature=0.4
+        )
+        
+        # Parse the response
+        gpt_response = response.choices[0].message.content
+        suggestions_data = json.loads(gpt_response)
+        
+        if 'suggestions' in suggestions_data and isinstance(suggestions_data['suggestions'], list):
+            return suggestions_data['suggestions']
+        else:
+            app.logger.error(f"Invalid suggestions response format: {suggestions_data}")
+            return []
+            
+    except Exception as e:
+        app.logger.error(f"Error generating meal suggestions: {e}")
+        return []
 
 @app.route('/portion-info', methods=['POST'])
 def portion_info():

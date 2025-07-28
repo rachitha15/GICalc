@@ -184,6 +184,14 @@ The application follows an intelligent Flask web service architecture with AI in
 - **Improved accuracy**: Users get precise nutrition data from curated database
 - **Reduced AI dependency**: Less reliance on potentially inaccurate AI estimates
 
+### AI-Powered Meal Suggestions (July 28, 2025)
+- **Intelligent Recommendations**: Context-aware suggestions based on actual meal composition and GL scores
+- **Specific Food Swaps**: AI provides exact substitutions like "Replace white rice with brown rice" instead of generic advice
+- **Indian Food Focus**: Suggestions prioritize common Indian foods and cooking methods
+- **Portion Guidance**: Includes specific portion modifications and combinations
+- **Educational Reasoning**: Each suggestion explains WHY it helps (GL reduction, fiber addition, etc.)
+- **Customizable Prompt**: Fully editable AI prompt system for precise recommendation control
+
 ## Implementation Summary (July 27, 2025)
 
 ### Core Functionality Delivered
