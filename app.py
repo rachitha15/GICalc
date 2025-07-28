@@ -683,7 +683,10 @@ def serve_assets(path):
 @app.route('/')
 def serve_frontend():
     """Serve the React frontend"""
-    return send_file('dist/index.html')
+    try:
+        return send_file('dist/index.html')
+    except FileNotFoundError:
+        return send_file('index.html')
 
 @app.route('/<path:path>')
 def serve_spa(path):
@@ -693,7 +696,10 @@ def serve_spa(path):
         return jsonify({'error': 'API route not found'}), 404
     
     # Serve the React app for all other routes
-    return send_file('dist/index.html')
+    try:
+        return send_file('dist/index.html')
+    except FileNotFoundError:
+        return send_file('index.html')
 
 # Load food database on startup
 with app.app_context():
