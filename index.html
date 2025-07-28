@@ -1,13 +1,82 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>FoodIQ - Smart Meal Analysis</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meal Analysis Business Logic</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #007acc;
+            padding-bottom: 10px;
+        }
+        .section {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-left: 4px solid #007acc;
+        }
+        code {
+            background: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+        .warning {
+            background: #fff3cd;
+            border-left-color: #ffc107;
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧠 Meal Analysis Business Logic Layer</h1>
+        
+        <div class="section">
+            <h3>✅ Architecture Complete</h3>
+            <p>All UI components have been removed. This project now contains only:</p>
+            <ul>
+                <li><code>src/business-logic.ts</code> - Pure state management and workflow logic</li>
+                <li><code>src/api.ts</code> - Backend communication layer</li>
+                <li><code>src/main.ts</code> - Entry point and usage examples</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h3>🔧 How to Use</h3>
+            <p>Import the business logic controller in your preferred UI framework:</p>
+            <pre><code>import { mealController } from './src/business-logic';</code></pre>
+        </div>
+
+        <div class="section">
+            <h3>🚀 Backend API</h3>
+            <p>The Flask backend continues running on port 5000, providing these endpoints:</p>
+            <ul>
+                <li><code>POST /parse-meal-chat</code> - Parse natural language meals</li>
+                <li><code>POST /calculate-gl</code> - Calculate glycemic load</li>
+                <li><code>POST /portion-info</code> - Get portion information</li>
+                <li><code>GET /health</code> - API health check</li>
+            </ul>
+        </div>
+
+        <div class="section warning">
+            <h3>ℹ️ No UI Rendering</h3>
+            <p>This project no longer contains any UI components or styling. The business logic is framework-agnostic and ready to be integrated with any frontend framework (React, Vue, Angular, plain HTML, etc.).</p>
+        </div>
+    </div>
+</body>
 </html>
