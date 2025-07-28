@@ -7,10 +7,44 @@ export default {
   theme: {
     extend: {
       colors: {
+        // New Playful Color Palette
+        primary: {
+          50: '#f3e8ff',
+          100: '#e9d5ff', 
+          500: '#9c27b0',
+          600: '#8e24aa',
+          700: '#7b1fa2',
+          900: '#4a148c'
+        },
+        secondary: {
+          50: '#e3f2fd',
+          100: '#bbdefb',
+          500: '#2196f3',
+          600: '#1e88e5',
+          700: '#1976d2',
+          900: '#0d47a1'
+        },
+        success: {
+          50: '#e8f5e8',
+          100: '#c8e6c9',
+          500: '#4caf50',
+          600: '#43a047',
+          700: '#388e3c',
+          900: '#1b5e20'
+        },
+        warning: {
+          50: '#fff3e0',
+          100: '#ffe0b2',
+          500: '#ff9800',
+          600: '#fb8c00',
+          700: '#f57c00',
+          900: '#e65100'
+        },
+        // Legacy GL colors (keeping for compatibility)
         gl: {
-          low: '#10b981',    // Green - GL < 10
-          medium: '#f59e0b', // Yellow - GL 10-20
-          high: '#ef4444',   // Red - GL > 20
+          low: '#4caf50',
+          medium: '#ff9800', 
+          high: '#ef4444',
         }
       },
       animation: {
@@ -29,6 +63,8 @@ export default {
         'success-bounce': 'successBounce 0.8s ease-out',
         'warning-shake': 'warningShake 0.6s ease-in-out',
         'celebration': 'celebration 1.2s ease-out',
+        'shimmer': 'shimmer 2s infinite',
+        'float': 'float 3s ease-in-out infinite',
       },
       keyframes: {
         fadeIn: {
@@ -97,6 +133,14 @@ export default {
           '50%': { transform: 'scale(1.2) rotate(5deg)' },
           '75%': { transform: 'scale(1.1) rotate(-5deg)' },
           '100%': { transform: 'scale(1) rotate(0deg)' }
+        },
+        shimmer: {
+          '0%': { transform: 'translateX(-100%)' },
+          '100%': { transform: 'translateX(100%)' }
+        },
+        float: {
+          '0%, 100%': { transform: 'translateY(0px)' },
+          '50%': { transform: 'translateY(-10px)' }
         }
       }
     },

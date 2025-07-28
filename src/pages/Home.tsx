@@ -90,41 +90,115 @@ export const Home: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 px-4 py-6 relative overflow-hidden">
-      {/* Animated background elements */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-20 left-10 w-32 h-32 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl animate-blob"></div>
-        <div className="absolute top-40 right-10 w-32 h-32 bg-yellow-300 rounded-full mix-blend-multiply filter blur-xl animate-blob animation-delay-2000"></div>
-        <div className="absolute -bottom-8 left-20 w-32 h-32 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl animate-blob animation-delay-4000"></div>
+    <div className="min-h-screen bg-gradient-to-br from-primary-500 via-secondary-500 to-primary-700 px-4 py-6 relative overflow-hidden">
+      {/* Dynamic animated background */}
+      <div className="absolute inset-0">
+        {/* Primary gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-r from-primary-600/90 via-secondary-600/90 to-primary-800/90"></div>
+        
+        {/* Floating food elements */}
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute top-20 left-10 w-24 h-24 bg-warning-400 rounded-full mix-blend-multiply filter blur-xl animate-blob">
+            {/* Rice bowl shape */}
+            <div className="w-full h-full rounded-full border-4 border-white/30"></div>
+          </div>
+          <div className="absolute top-40 right-10 w-32 h-32 bg-success-400 rounded-full mix-blend-multiply filter blur-xl animate-blob animation-delay-2000">
+            {/* Vegetable shape */}
+            <div className="w-full h-full rounded-full border-4 border-white/30"></div>
+          </div>
+          <div className="absolute -bottom-8 left-20 w-28 h-28 bg-warning-300 rounded-full mix-blend-multiply filter blur-xl animate-blob animation-delay-4000">
+            {/* Dal/curry shape */}
+            <div className="w-full h-full rounded-full border-4 border-white/30"></div>
+          </div>
+          <div className="absolute top-1/2 left-1/4 w-20 h-20 bg-secondary-300 rounded-full mix-blend-multiply filter blur-xl animate-blob animation-delay-1000">
+            {/* Roti shape */}
+            <div className="w-full h-full rounded-full border-4 border-white/30"></div>
+          </div>
+        </div>
+        
+        {/* Geometric patterns */}
+        <div className="absolute top-0 left-0 w-full h-full">
+          <div className="absolute top-10 left-1/3 w-2 h-2 bg-white/40 rounded-full animate-pulse"></div>
+          <div className="absolute top-1/4 right-1/4 w-1 h-1 bg-white/60 rounded-full animate-bounce"></div>
+          <div className="absolute bottom-1/3 left-1/5 w-3 h-3 bg-white/30 rounded-full animate-pulse animation-delay-2000"></div>
+          <div className="absolute top-2/3 right-1/3 w-1 h-1 bg-white/50 rounded-full animate-bounce animation-delay-1000"></div>
+        </div>
       </div>
 
       <div className="max-w-md mx-auto sm:max-w-lg relative z-10">
-        {/* Header */}
+        {/* Revolutionary Hero Section */}
         <div className="text-center mb-8 animate-fade-in-up">
-          <div className="relative mb-6">
-            <div className="bg-gradient-to-br from-white to-gray-50 rounded-3xl w-20 h-20 mx-auto flex items-center justify-center shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-110 hover:rotate-12">
-              <span className="text-3xl animate-bounce-gentle">🍽️</span>
+          {/* Playful floating icon with food illustrations */}
+          <div className="relative mb-8">
+            <div className="bg-gradient-to-br from-white via-white to-white/95 rounded-full w-28 h-28 mx-auto flex items-center justify-center shadow-2xl hover:shadow-3xl transition-all duration-500 hover:scale-110 hover:rotate-12 animate-bounce-gentle">
+              {/* Custom food bowl SVG */}
+              <div className="relative">
+                <div className="text-4xl animate-bounce-gentle">🍛</div>
+                {/* Add sparkle effects */}
+                <div className="absolute -top-2 -right-2 text-lg animate-pulse">✨</div>
+                <div className="absolute -bottom-1 -left-2 text-sm animate-bounce animation-delay-500">🌟</div>
+              </div>
             </div>
-            <div className="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-r from-green-400 to-blue-500 rounded-full animate-pulse shadow-lg"></div>
+            
+            {/* Floating status indicators */}
+            <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-r from-success-400 to-success-600 rounded-full animate-pulse shadow-lg flex items-center justify-center">
+              <span className="text-white text-sm font-bold">AI</span>
+            </div>
+            <div className="absolute -bottom-2 -left-2 w-6 h-6 bg-gradient-to-r from-warning-400 to-warning-600 rounded-full animate-pulse shadow-lg flex items-center justify-center">
+              <span className="text-white text-xs">🔥</span>
+            </div>
           </div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 bg-clip-text text-transparent mb-3 animate-slide-in">
-            Glycemic Load Tracker
-          </h1>
-          <p className="text-gray-600 text-lg font-medium animate-fade-in-delayed">
-            ✨ Discover your meal's blood sugar impact
-          </p>
+          
+          {/* Dynamic animated title */}
+          <div className="mb-6">
+            <h1 className="text-4xl md:text-5xl font-black bg-gradient-to-r from-white via-white to-white/90 bg-clip-text text-transparent mb-4 animate-slide-in leading-tight">
+              FoodIQ
+            </h1>
+            <div className="text-xl md:text-2xl font-bold text-white/90 mb-3 animate-fade-in-delayed">
+              <span className="inline-block animate-bounce">🧠</span>
+              <span className="ml-2">Smart Meal Analysis</span>
+            </div>
+          </div>
+          
+          {/* Engaging tagline with typewriter effect */}
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl px-6 py-4 mx-auto max-w-md animate-fade-in-delayed border border-white/20">
+            <p className="text-white text-lg font-semibold flex items-center justify-center">
+              <span className="mr-2 animate-pulse">⚡</span>
+              Discover your meal's health score instantly!
+              <span className="ml-2 animate-pulse">⚡</span>
+            </p>
+          </div>
+          
+          {/* Fun stats or badges */}
+          <div className="flex justify-center space-x-4 mt-6">
+            <div className="bg-white/15 backdrop-blur-sm rounded-xl px-4 py-2 border border-white/20">
+              <div className="text-white font-bold text-lg">56+</div>
+              <div className="text-white/80 text-xs">Indian Foods</div>
+            </div>
+            <div className="bg-white/15 backdrop-blur-sm rounded-xl px-4 py-2 border border-white/20">
+              <div className="text-white font-bold text-lg">AI</div>
+              <div className="text-white/80 text-xs">Powered</div>
+            </div>
+            <div className="bg-white/15 backdrop-blur-sm rounded-xl px-4 py-2 border border-white/20">
+              <div className="text-white font-bold text-lg">⚡</div>
+              <div className="text-white/80 text-xs">Instant</div>
+            </div>
+          </div>
         </div>
 
-        {/* Error Display */}
+        {/* Playful Error Display */}
         {error && (
-          <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-400 rounded-r-2xl text-red-700 animate-shake shadow-lg">
-            <div className="flex items-center space-x-3">
+          <div className="mb-6 p-6 bg-gradient-to-r from-red-500/10 via-red-400/10 to-orange-500/10 backdrop-blur-sm border-2 border-red-400/30 rounded-3xl text-white animate-shake shadow-2xl">
+            <div className="flex items-center space-x-4">
               <div className="flex-shrink-0">
-                <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
-                  <span className="text-red-500">⚠️</span>
+                <div className="w-12 h-12 bg-gradient-to-r from-red-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg animate-bounce">
+                  <span className="text-white text-2xl">🤔</span>
                 </div>
               </div>
-              <span className="font-medium">{error}</span>
+              <div className="flex-1">
+                <div className="font-bold text-lg mb-1">Oops! Let me help you</div>
+                <span className="font-medium text-white/90">{error}</span>
+              </div>
             </div>
           </div>
         )}

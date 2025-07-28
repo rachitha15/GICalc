@@ -31,19 +31,42 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSubmit, isLoading = fals
 
   return (
     <div className="w-full space-y-8 animate-slide-up">
-      {/* Input Card with Gradient Design */}
-      <div className="bg-gradient-to-br from-white to-gray-50 rounded-3xl shadow-2xl p-8 relative overflow-hidden">
-        {/* Decorative elements */}
-        <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full -translate-y-12 translate-x-12 opacity-60"></div>
-        <div className="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-tr from-green-100 to-blue-100 rounded-full translate-y-8 -translate-x-8 opacity-60"></div>
+      {/* Revolutionary Input Experience */}
+      <div className="bg-gradient-to-br from-white/95 via-white/90 to-white/85 backdrop-blur-sm rounded-3xl shadow-2xl p-8 relative overflow-hidden border border-white/20">
+        {/* Food-themed decorative elements */}
+        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-warning-200/60 to-success-200/60 rounded-full -translate-y-16 translate-x-16 opacity-80 animate-pulse">
+          {/* Rice grain pattern */}
+          <div className="absolute inset-4 bg-white/40 rounded-full"></div>
+        </div>
+        <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-success-200/60 to-secondary-200/60 rounded-full translate-y-12 -translate-x-12 opacity-80 animate-pulse animation-delay-1000">
+          {/* Vegetable pattern */}
+          <div className="absolute inset-3 bg-white/40 rounded-full"></div>
+        </div>
+        
+        {/* Floating food emojis */}
+        <div className="absolute top-4 left-4 text-2xl opacity-20 animate-bounce animation-delay-2000">🍛</div>
+        <div className="absolute top-8 right-8 text-lg opacity-20 animate-bounce animation-delay-3000">🥘</div>
+        <div className="absolute bottom-6 right-12 text-xl opacity-20 animate-bounce animation-delay-1000">🍽️</div>
         
         <div className="relative z-10">
-          <div className="text-center mb-6">
-            <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-blue-600 rounded-full mx-auto mb-4 flex items-center justify-center shadow-xl animate-bounce-gentle">
-              <span className="text-2xl text-white">✍️</span>
+          <div className="text-center mb-8 relative z-10">
+            <div className="relative mb-6">
+              <div className="w-20 h-20 bg-gradient-to-br from-primary-500 via-secondary-500 to-primary-700 rounded-full mx-auto flex items-center justify-center shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-110 animate-bounce-gentle">
+                <span className="text-3xl text-white animate-pulse">🍽️</span>
+              </div>
+              {/* Sparkle effects around icon */}
+              <div className="absolute -top-1 -right-1 w-4 h-4 bg-warning-400 rounded-full animate-ping"></div>
+              <div className="absolute -bottom-1 -left-1 w-3 h-3 bg-success-400 rounded-full animate-pulse animation-delay-1000"></div>
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Tell Me About Your Meal</h2>
-            <p className="text-gray-600">Describe what you ate and I'll calculate the impact</p>
+            
+            <h2 className="text-3xl font-black bg-gradient-to-r from-primary-600 via-secondary-600 to-primary-800 bg-clip-text text-transparent mb-3">
+              What's on your plate?
+            </h2>
+            <p className="text-gray-700 text-lg font-medium">
+              <span className="inline-block animate-bounce mr-2">🧠</span>
+              Let AI analyze your meal's health impact
+              <span className="inline-block animate-bounce ml-2">⚡</span>
+            </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -85,21 +108,26 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSubmit, isLoading = fals
             <button
               type="submit"
               disabled={!input.trim() || isLoading}
-              className={`w-full py-5 rounded-2xl font-bold text-lg shadow-xl transition-all duration-300 ${
+              className={`w-full py-6 rounded-3xl font-black text-xl shadow-2xl transition-all duration-300 relative overflow-hidden ${
                 !input.trim() || isLoading
                   ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700 hover:scale-105 hover:shadow-2xl animate-pulse-glow'
+                  : 'bg-gradient-to-r from-primary-600 via-secondary-600 to-primary-700 text-white hover:from-primary-700 hover:via-secondary-700 hover:to-primary-800 hover:scale-105 hover:shadow-3xl transform-gpu'
               }`}
             >
+              {!input.trim() || isLoading ? null : (
+                <div className="absolute inset-0 bg-gradient-to-r from-white/20 via-transparent to-white/20 animate-shimmer"></div>
+              )}
+              
               {isLoading ? (
                 <div className="flex items-center justify-center space-x-3">
-                  <div className="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
-                  <span>🧠 Analyzing your meal...</span>
+                  <div className="w-7 h-7 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <span className="animate-pulse">🧠 Analyzing your delicious meal...</span>
                 </div>
               ) : (
-                <span className="flex items-center justify-center space-x-2">
-                  <span>🚀</span>
+                <span className="flex items-center justify-center space-x-3 relative z-10">
+                  <span className="text-2xl animate-bounce">🚀</span>
                   <span>Analyze My Meal</span>
+                  <span className="text-lg animate-pulse">✨</span>
                 </span>
               )}
             </button>
@@ -107,37 +135,66 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSubmit, isLoading = fals
         </div>
       </div>
 
-      {/* Enhanced Examples Card */}
-      <div className="bg-gradient-to-br from-white to-gray-50 rounded-3xl shadow-2xl p-8 relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-20 h-20 bg-gradient-to-br from-yellow-100 to-orange-100 rounded-full -translate-y-10 -translate-x-10 opacity-60"></div>
+      {/* Playful Examples Section */}
+      <div className="bg-gradient-to-br from-white/95 via-white/90 to-white/85 backdrop-blur-sm rounded-3xl shadow-2xl p-8 relative overflow-hidden border border-white/20">
+        {/* Decorative food elements */}
+        <div className="absolute top-0 left-0 w-24 h-24 bg-gradient-to-br from-warning-200/60 to-success-200/60 rounded-full -translate-y-12 -translate-x-12 opacity-70 animate-pulse"></div>
+        <div className="absolute bottom-0 right-0 w-20 h-20 bg-gradient-to-br from-secondary-200/60 to-primary-200/60 rounded-full translate-y-10 translate-x-10 opacity-70 animate-pulse animation-delay-2000"></div>
+        
+        {/* Floating food icons */}
+        <div className="absolute top-4 right-6 text-xl opacity-30 animate-bounce animation-delay-1000">🍜</div>
+        <div className="absolute bottom-6 left-8 text-lg opacity-30 animate-bounce animation-delay-3000">🫓</div>
         
         <div className="relative z-10">
-          <div className="text-center mb-6">
-            <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-500 rounded-full mx-auto mb-3 flex items-center justify-center shadow-lg">
-              <span className="text-xl text-white">💡</span>
+          <div className="text-center mb-8">
+            <div className="relative mb-6">
+              <div className="w-20 h-20 bg-gradient-to-br from-success-500 via-success-600 to-success-700 rounded-full mx-auto flex items-center justify-center shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-110 animate-bounce-gentle">
+                <span className="text-3xl text-white animate-pulse">💡</span>
+              </div>
+              {/* Sparkle effects */}
+              <div className="absolute -top-1 -right-1 w-4 h-4 bg-warning-400 rounded-full animate-ping"></div>
+              <div className="absolute -bottom-1 -left-1 w-3 h-3 bg-secondary-400 rounded-full animate-pulse animation-delay-1000"></div>
             </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">Quick Examples</h3>
-            <p className="text-gray-600">Click any example to get started instantly</p>
+            
+            <h3 className="text-2xl font-black bg-gradient-to-r from-success-600 via-success-700 to-success-800 bg-clip-text text-transparent mb-3">
+              Try These Examples!
+            </h3>
+            <p className="text-gray-700 text-lg font-medium">
+              <span className="inline-block animate-bounce mr-2">👆</span>
+              Tap any meal to analyze instantly
+              <span className="inline-block animate-bounce ml-2">⚡</span>
+            </p>
           </div>
           
-          <div className="space-y-4">
+          <div className="grid gap-4">
             {exampleMeals.map((example, index) => (
               <button
                 key={index}
                 onClick={() => handleExampleClick(example)}
                 disabled={isLoading}
-                className="w-full p-5 text-left bg-white/80 backdrop-blur-sm hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 border-2 border-gray-200 hover:border-blue-300 rounded-2xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.02] hover:shadow-lg group"
+                className="w-full p-6 text-left bg-gradient-to-r from-white/90 to-white/80 backdrop-blur-sm hover:from-primary-50/80 hover:to-secondary-50/80 border-2 border-white/30 hover:border-primary-300/50 rounded-3xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.02] hover:shadow-2xl group relative overflow-hidden"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
-                <div className="flex items-center space-x-4">
-                  <div className="w-10 h-10 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <span className="text-lg">
+                {/* Shimmer effect on hover */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-out"></div>
+                
+                <div className="flex items-center space-x-5 relative z-10">
+                  <div className="w-14 h-14 bg-gradient-to-br from-primary-400 via-secondary-400 to-success-400 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg">
+                    <span className="text-2xl">
                       {index === 0 ? '🥙' : index === 1 ? '🍛' : '🍽️'}
                     </span>
                   </div>
-                  <span className="text-gray-700 font-medium text-lg group-hover:text-gray-900 transition-colors">
-                    {example}
-                  </span>
+                  <div className="flex-1">
+                    <span className="text-gray-800 font-bold text-lg group-hover:text-gray-900 transition-colors block">
+                      {example}
+                    </span>
+                    <span className="text-gray-500 text-sm font-medium">
+                      Tap to try this meal →
+                    </span>
+                  </div>
+                  <div className="text-primary-400 group-hover:text-primary-600 transition-colors">
+                    <span className="text-xl animate-bounce">⚡</span>
+                  </div>
                 </div>
               </button>
             ))}

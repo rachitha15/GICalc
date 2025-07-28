@@ -41,9 +41,9 @@ export const GLResult: React.FC<GLResultProps> = ({ result, onStartOver }) => {
 
   return (
     <div className="w-full space-y-6">
-      {/* Result Header with Dynamic Animations */}
-      <div className={`bg-gradient-to-br from-white to-gray-50 rounded-3xl shadow-2xl p-8 text-center relative overflow-hidden ${
-        total_gl <= 10 ? 'animate-success-bounce' : 
+      {/* Revolutionary Result Header */}
+      <div className={`bg-gradient-to-br from-white/95 via-white/90 to-white/85 backdrop-blur-sm rounded-3xl shadow-2xl p-10 text-center relative overflow-hidden border border-white/20 ${
+        total_gl <= 10 ? 'animate-celebration' : 
         total_gl > 20 ? 'animate-warning-shake' : ''
       }`}>
         {/* Background decoration */}
