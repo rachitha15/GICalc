@@ -66,7 +66,7 @@ export const Home: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-600 via-blue-600 to-purple-800">
+    <div className="min-h-screen bg-gradient-to-br from-purple-600 via-blue-600 to-purple-800" style={{background: 'linear-gradient(to bottom right, rgb(147 51 234), rgb(37 99 235), rgb(107 33 168))'}}>
       {/* Hero Section */}
       <div className="relative py-16 px-4">
         {/* Animated background elements */}
