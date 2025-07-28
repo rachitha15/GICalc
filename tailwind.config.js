@@ -146,18 +146,21 @@ export default {
     },
   },
   safelist: [
-    'bg-green-50',
-    'bg-green-100',
-    'bg-yellow-50', 
-    'bg-yellow-100',
-    'bg-red-50',
-    'bg-red-100',
-    'text-green-800',
-    'text-yellow-800', 
-    'text-red-800',
-    'border-green-400',
-    'border-yellow-400',
-    'border-red-400',
+    // Background colors
+    'bg-green-50', 'bg-green-100', 'bg-yellow-50', 'bg-yellow-100', 'bg-red-50', 'bg-red-100',
+    // Text colors - CRITICAL for visibility
+    'text-white', 'text-white/90', 'text-white/80', 'text-gray-700', 'text-gray-800', 'text-gray-600', 'text-gray-500',
+    'text-green-800', 'text-yellow-800', 'text-red-800',
+    // Border colors
+    'border-green-400', 'border-yellow-400', 'border-red-400',
+    'border-white/20', 'border-white/30', 'border-purple-200', 'border-purple-300/50',
+    // Gradient colors
+    'from-purple-600', 'via-blue-600', 'to-purple-800', 'from-purple-500', 'to-blue-600',
+    'from-purple-700', 'to-blue-700', 'from-green-500', 'to-green-700', 'from-green-600', 'to-green-800',
+    'from-purple-400', 'to-blue-400', 'from-white/90', 'to-white/80', 'from-purple-50/80', 'to-blue-50/80',
+    // Background opacity
+    'bg-white/95', 'bg-white/90', 'bg-white/80', 'bg-white/20', 'bg-white/10',
+    'bg-orange-300/20', 'bg-green-300/20', 'bg-purple-100', 'bg-orange-100',
   ],
   plugins: [],
 }
