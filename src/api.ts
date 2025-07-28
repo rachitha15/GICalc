@@ -28,9 +28,8 @@ export interface GLCalculationResult {
   suggestions?: MealSuggestion[];
 }
 
-export const api = {
-  // Parse natural language meal description
-  async parseMealChat(text: string): Promise<ParsedMealItem[]> {
+// Export individual functions
+export async function parseMealChat(text: string): Promise<ParsedMealItem[]> {
     const response = await fetch(`${API_BASE}/parse-meal-chat`, {
       method: 'POST',
       headers: {
@@ -44,10 +43,9 @@ export const api = {
     }
 
     return response.json();
-  },
+}
 
-  // Smart meal parsing with database disambiguation
-  async parseMealSmart(text: string) {
+export async function parseMealSmart(text: string) {
     const response = await fetch(`${API_BASE}/parse-meal-smart`, {
       method: 'POST',
       headers: {
@@ -61,10 +59,9 @@ export const api = {
     }
 
     return response.json();
-  },
+}
 
-  // Get portion information for a specific food
-  async getPortionInfo(food: string): Promise<PortionInfo> {
+export async function getPortionInfo(food: string): Promise<PortionInfo> {
     const response = await fetch(`${API_BASE}/portion-info`, {
       method: 'POST',
       headers: {
@@ -78,10 +75,9 @@ export const api = {
     }
 
     return response.json();
-  },
+}
 
-  // Calculate glycemic load for meal items
-  async calculateGL(meal: ParsedMealItem[]): Promise<GLCalculationResult> {
+export async function calculateGL(meal: ParsedMealItem[]): Promise<GLCalculationResult> {
     const response = await fetch(`${API_BASE}/calculate-gl`, {
       method: 'POST',
       headers: {
@@ -95,10 +91,9 @@ export const api = {
     }
 
     return response.json();
-  },
+}
 
-  // Health check
-  async healthCheck(): Promise<{ status: string; message: string }> {
+export async function healthCheck(): Promise<{ status: string; message: string }> {
     const response = await fetch(`${API_BASE}/health`);
     
     if (!response.ok) {
@@ -106,5 +101,4 @@ export const api = {
     }
 
     return response.json();
-  },
-};
+}

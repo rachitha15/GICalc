@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { api, PortionInfo } from '../api';
+import { getPortionInfo, PortionInfo } from '../api';
 
 interface PortionSelectorProps {
   food: string;
@@ -21,7 +21,7 @@ export const PortionSelector: React.FC<PortionSelectorProps> = ({
       try {
         setIsLoading(true);
         setError(null);
-        const info = await api.getPortionInfo(food);
+        const info = await getPortionInfo(food);
         setPortionInfo(info);
       } catch (err) {
         setError('Could not load portion info');

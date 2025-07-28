@@ -3,7 +3,7 @@ import { ChatInput } from '../components/ChatInput';
 import { ParsedMealList } from '../components/ParsedMealList';
 import { GLResult } from '../components/GLResult';
 import { FoodDisambiguation } from '../components/FoodDisambiguation';
-import { parseMealSmart, calculateGL, GLCalculationResult } from '../api';
+import { parseMealChat, calculateGL, GLCalculationResult } from '../api';
 
 interface ParsedItem {
   original_name: string;
@@ -23,23 +23,14 @@ export const Home: React.FC = () => {
   const handleMealSubmit = async (mealText: string) => {
     setIsLoading(true);
     try {
-      const parsed = await parseMealSmart(mealText);
-      setParsedMeal(parsed.items);
-      
-      // Check if any items need disambiguation
-      const needsDisambiguation = parsed.items.some(item => item.status === 'needs_disambiguation');
-      
-      if (needsDisambiguation) {
-        setCurrentStep('disambiguation');
-      } else {
-        // Auto-convert items that don't need disambiguation
-        const finalItems = parsed.items.map(item => ({
-          food: item.selected_food || item.original_name,
-          quantity: item.quantity
-        }));
-        setFinalMeal(finalItems);
-        setCurrentStep('portions');
-      }
+      const parsed = await parseMealChat(mealText);
+      // Convert parsed meal to final format
+      const finalItems = parsed.map(item => ({
+        food: item.food,
+        quantity: item.quantity
+      }));
+      setFinalMeal(finalItems);
+      setCurrentStep('portions');
     } catch (error) {
       console.error('Error parsing meal:', error);
       alert('Failed to parse meal. Please try again.');
@@ -116,13 +107,7 @@ export const Home: React.FC = () => {
           <ChatInput onSubmit={handleMealSubmit} isLoading={isLoading} />
         )}
 
-        {currentStep === 'disambiguation' && (
-          <FoodDisambiguation
-            parsedMeal={parsedMeal}
-            onComplete={handleDisambiguationComplete}
-            onBack={handleStartOver}
-          />
-        )}
+        {/* Disambiguation step removed for simplified flow */}
 
         {currentStep === 'portions' && (
           <ParsedMealList
