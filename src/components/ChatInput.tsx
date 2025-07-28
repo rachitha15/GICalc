@@ -29,43 +29,49 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSubmit, isLoading = fals
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto space-y-4 animate-fade-in">
-      <form onSubmit={handleSubmit} className="relative">
-        <div className="relative">
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="e.g., 2 pooris, 1 bowl chole, 1 katori kheer"
-            className="w-full px-4 py-4 text-lg bg-white border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors shadow-sm"
-            disabled={isLoading}
-          />
-          {isLoading && (
-            <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
-            </div>
-          )}
-        </div>
-        <button
-          type="submit"
-          disabled={!input.trim() || isLoading}
-          className="absolute right-2 top-1/2 transform -translate-y-1/2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-        >
-          {isLoading ? '...' : '→'}
-        </button>
-      </form>
+    <div className="w-full space-y-6">
+      {/* Input Card */}
+      <div className="bg-white rounded-2xl shadow-lg p-6">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="relative">
+            <textarea
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="What did you eat today?&#10;e.g., 2 rotis with dal and rice"
+              className="w-full px-4 py-4 text-base bg-gray-50 border-0 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all resize-none"
+              rows={3}
+              disabled={isLoading}
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={!input.trim() || isLoading}
+            className="w-full py-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold rounded-xl hover:from-blue-600 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md"
+          >
+            {isLoading ? (
+              <div className="flex items-center justify-center space-x-2">
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                <span>Analyzing...</span>
+              </div>
+            ) : (
+              'Analyze My Meal'
+            )}
+          </button>
+        </form>
+      </div>
 
-      <div className="space-y-2">
-        <p className="text-sm text-gray-600 font-medium">Try these examples:</p>
-        <div className="flex flex-wrap gap-2">
+      {/* Examples Card */}
+      <div className="bg-white rounded-2xl shadow-lg p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Examples</h3>
+        <div className="space-y-3">
           {exampleMeals.map((example, index) => (
             <button
               key={index}
               onClick={() => handleExampleClick(example)}
               disabled={isLoading}
-              className="px-3 py-2 text-sm bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full p-4 text-left bg-gray-50 hover:bg-blue-50 hover:border-blue-200 border border-transparent rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {example}
+              <span className="text-gray-700">{example}</span>
             </button>
           ))}
         </div>

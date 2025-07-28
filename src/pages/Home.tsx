@@ -57,21 +57,24 @@ export const Home: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      <div className="max-w-md mx-auto px-4 py-6 sm:max-w-lg">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">
+          <div className="bg-white rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center shadow-md">
+            <span className="text-2xl">🍽️</span>
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
             Glycemic Load Tracker
           </h1>
-          <p className="text-gray-600 text-lg">
-            Let's check your meal's sugar impact
+          <p className="text-gray-600">
+            Check your meal's sugar impact
           </p>
         </div>
 
         {/* Error Display */}
         {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 animate-fade-in">
+          <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-400 rounded-r-lg text-red-700">
             <div className="flex items-center space-x-2">
               <span>❌</span>
               <span>{error}</span>

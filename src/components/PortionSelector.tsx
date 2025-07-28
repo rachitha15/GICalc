@@ -53,48 +53,39 @@ export const PortionSelector: React.FC<PortionSelectorProps> = ({
   }
 
   return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <h3 className="font-medium text-gray-800">How much {food}?</h3>
+    <div className="space-y-4">
+      <div>
+        <h3 className="font-semibold text-gray-900 text-lg mb-1">{food}</h3>
+        {portionInfo && (
+          <p className="text-sm text-gray-600">
+            1 {portionInfo.unit} = {portionInfo.unit_desc}
+          </p>
+        )}
         {error && (
-          <span className="text-xs text-amber-600">Using default portions</span>
+          <p className="text-xs text-amber-600 mt-1">Using default portions</p>
         )}
       </div>
       
-      {portionInfo && (
-        <p className="text-sm text-gray-600">
-          (1 {portionInfo.unit} = {portionInfo.unit_desc})
+      <div>
+        <p className="text-sm font-medium text-gray-700 mb-3">Select amount:</p>
+        <div className="grid grid-cols-3 gap-2">
+          {portionOptions.map((option) => (
+            <button
+              key={option}
+              onClick={() => onQuantityChange(option)}
+              className={`px-4 py-3 rounded-xl transition-all text-sm font-semibold ${
+                quantity === option
+                  ? 'bg-blue-500 text-white shadow-md transform scale-105'
+                  : 'bg-white text-gray-700 border-2 border-gray-200 hover:border-blue-300 hover:bg-blue-50'
+              }`}
+            >
+              {option}
+            </button>
+          ))}
+        </div>
+        <p className="text-xs text-gray-500 mt-2 text-center">
+          {portionInfo?.unit || 'serving'}{quantity !== 1 ? 's' : ''}
         </p>
-      )}
-      
-      <div className="flex flex-wrap gap-2">
-        {portionOptions.map((option) => (
-          <button
-            key={option}
-            onClick={() => onQuantityChange(option)}
-            className={`px-3 py-2 rounded-lg border transition-colors text-sm font-medium ${
-              quantity === option
-                ? 'bg-blue-500 text-white border-blue-500'
-                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-            }`}
-          >
-            {option} {portionInfo?.unit || 'serving'}{option !== 1 ? 's' : ''}
-          </button>
-        ))}
-      </div>
-      
-      <div className="flex items-center space-x-2">
-        <span className="text-sm text-gray-600">Custom amount:</span>
-        <input
-          type="number"
-          min="0"
-          step="0.1"
-          value={quantity || ''}
-          onChange={(e) => onQuantityChange(parseFloat(e.target.value) || 0)}
-          className="w-20 px-2 py-1 border border-gray-300 rounded text-sm focus:border-blue-500 focus:outline-none"
-          placeholder="0"
-        />
-        <span className="text-sm text-gray-600">{portionInfo?.unit || 'serving'}(s)</span>
       </div>
     </div>
   );
