@@ -91,6 +91,9 @@ Example for 'Kheer':
         
         # Parse the response
         gpt_response = response.choices[0].message.content
+        if not gpt_response:
+            app.logger.error(f"Empty response from AI for {food_name}")
+            return None
         nutrition_data = json.loads(gpt_response)
         
         # Validate the response structure
@@ -329,6 +332,11 @@ Important: Always return a JSON object with a "meal" key containing an array of 
         
         try:
             # Parse JSON response from GPT
+            if not gpt_response:
+                return jsonify({
+                    'status': 'error',
+                    'message': 'Could not parse meal'
+                }), 400
             parsed_response = json.loads(gpt_response)
             
             # Check if the response is a valid array format
@@ -439,6 +447,11 @@ Important: Always return a JSON object with a "meal" key containing an array of 
         
         # Parse the response
         gpt_response = response.choices[0].message.content
+        if not gpt_response:
+            return jsonify({
+                'status': 'error',
+                'message': 'Could not parse meal'
+            }), 400
         parsed_response = json.loads(gpt_response)
         
         if 'meal' not in parsed_response:
@@ -448,6 +461,14 @@ Important: Always return a JSON object with a "meal" key containing an array of 
             }), 400
         
         meal_array = parsed_response['meal']
+        
+        # Check if any food items were actually found
+        if not meal_array or len(meal_array) == 0:
+            return jsonify({
+                'status': 'error',
+                'message': 'No food items found in your description'
+            }), 400
+        
         result_items = []
         
         # Check each food item for database matches

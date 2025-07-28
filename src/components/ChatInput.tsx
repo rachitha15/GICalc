@@ -13,6 +13,7 @@ const exampleMeals = [
 
 export const ChatInput: React.FC<ChatInputProps> = ({ onSubmit, isLoading = false }) => {
   const [input, setInput] = useState('');
+  const MAX_CHARACTERS = 200;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,14 +50,35 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSubmit, isLoading = fals
             <div className="relative group">
               <textarea
                 value={input}
-                onChange={(e) => setInput(e.target.value)}
+                onChange={(e) => {
+                  const newValue = e.target.value;
+                  if (newValue.length <= MAX_CHARACTERS) {
+                    setInput(newValue);
+                  }
+                }}
                 placeholder="What did you eat today?&#10;e.g., 2 rotis with dal and rice"
-                className="w-full px-6 py-5 text-lg bg-white/80 backdrop-blur-sm border-2 border-gray-200 rounded-2xl focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-100 focus:outline-none transition-all resize-none group-hover:border-gray-300 shadow-lg"
+                className={`w-full px-6 py-5 text-lg bg-white/80 backdrop-blur-sm border-2 rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-100 focus:outline-none transition-all resize-none group-hover:border-gray-300 shadow-lg ${
+                  input.length >= MAX_CHARACTERS * 0.9 
+                    ? 'border-yellow-400 focus:border-yellow-500 focus:ring-yellow-100' 
+                    : 'border-gray-200 focus:border-blue-400'
+                }`}
                 rows={4}
                 disabled={isLoading}
+                maxLength={MAX_CHARACTERS}
               />
               <div className="absolute top-4 right-4 text-gray-400 text-2xl pointer-events-none">
                 🍽️
+              </div>
+              
+              {/* Character counter */}
+              <div className={`absolute bottom-2 right-4 text-sm font-medium ${
+                input.length >= MAX_CHARACTERS * 0.9 
+                  ? input.length >= MAX_CHARACTERS 
+                    ? 'text-red-600' 
+                    : 'text-yellow-600'
+                  : 'text-gray-400'
+              }`}>
+                {input.length}/{MAX_CHARACTERS}
               </div>
             </div>
             

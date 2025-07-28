@@ -22,6 +22,12 @@ export const Home: React.FC = () => {
       
       const result = await api.parseMealSmart(text);
       if (result.status === 'success') {
+        // Check if any food items were found
+        if (!result.items || result.items.length === 0) {
+          setError('No food items found in your description. Please describe your meal with specific foods like "2 rotis with dal" or "1 bowl rice with curry".');
+          return;
+        }
+        
         // Check if any items need disambiguation
         const needsDisambiguation = result.items.some((item: any) => 
           item.status === 'needs_disambiguation'
@@ -40,10 +46,10 @@ export const Home: React.FC = () => {
           setAppState('portions');
         }
       } else {
-        setError('Failed to parse meal');
+        setError('No food items found in your description. Please describe your meal with specific foods like "2 rotis with dal" or "1 bowl rice with curry".');
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to parse meal');
+      setError(err instanceof Error ? err.message : 'No food items found in your description. Please describe your meal with specific foods like "2 rotis with dal" or "1 bowl rice with curry".');
     } finally {
       setIsLoading(false);
     }
