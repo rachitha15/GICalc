@@ -30,8 +30,9 @@ The application follows an intelligent Flask web service architecture with AI in
 - **AI Integration (`get_nutrition_from_ai()` function)**: Powers nutrition estimation for foods not in the database, validating AI responses for data integrity.
 - **Intelligent Food Lookup System**: Prioritizes fast database lookup, then AI nutrition estimation, with a graceful "not_found" fallback.
 - **Natural Language Processing**: The `/parse-meal-chat` endpoint converts conversational meal descriptions into structured data using OpenAI GPT-4o.
-- **Smart Food Disambiguation System**: Enhances food parsing with a database-first approach, offering user choices for multiple matches and using AI for truly unknown items.
+- **Smart Food Disambiguation System**: Enhances food parsing with a database-first approach, offering user choices for multiple matches and using AI for truly unknown items. Users can select "None of these - Use AI to estimate" option when database matches are poor.
 - **AI-Powered Meal Suggestions**: Context-aware recommendations based on meal composition and GL scores, focusing on specific food swaps and portion guidance, with an emphasis on Indian foods. Suggestions are shown for GL ≥ 11.
+- **Hybrid Portion Description System**: For AI-estimated foods, the system first looks for similar foods in the database to use their portion descriptions, then falls back to AI-generated portion guidance when no similar foods are found.
 - **Comprehensive API Endpoints**:
     - `POST /calculate-gl`: Core GL calculation with AI fallback.
     - `POST /parse-meal-chat`: Natural language meal parsing.

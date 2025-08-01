@@ -600,6 +600,69 @@ Example response:
         app.logger.error(f"Error generating meal suggestions: {e}")
         return []
 
+def find_similar_food_portions(food_name):
+    """Find similar foods in database for portion size reference"""
+    food_name_lower = food_name.lower()
+    food_words = food_name_lower.split()
+    
+    # Look for foods with similar keywords
+    similar_foods = []
+    for item in food_database:
+        item_name_lower = item['name'].lower()
+        item_words = item_name_lower.split()
+        
+        # Check for common words (excluding very common words)
+        common_words = set(food_words) & set(item_words)
+        common_words = common_words - {'with', 'and', 'in', 'of', 'the', 'a', 'an', 'or'}
+        
+        if len(common_words) > 0:
+            similar_foods.append({
+                'name': item['name'],
+                'unit_desc': item['unit_desc'],
+                'common_words': len(common_words)
+            })
+    
+    # Sort by number of common words (descending)
+    similar_foods.sort(key=lambda x: x['common_words'], reverse=True)
+    
+    return similar_foods[:3]  # Return top 3 matches
+
+def get_ai_portion_description(food_name):
+    """Get AI-generated portion description for unknown foods"""
+    if not openai_client:
+        return f"1 serving (typical portion for {food_name})"
+    
+    try:
+        prompt = f"""Provide typical portion sizes for "{food_name}" in Indian cuisine context.
+
+Return a JSON object with "unit_desc" containing a brief, practical description of what 1 serving typically weighs or looks like.
+
+Examples:
+- For curries/masala: "150g (1 medium bowl)"  
+- For rice dishes: "200g (1 cup cooked)"
+- For bread items: "40g (1 medium piece)"
+- For vegetable dishes: "100g (1 serving spoon)"
+
+Keep it concise and practical. Return only JSON format: {{"unit_desc": "description"}}"""
+
+        response = openai_client.chat.completions.create(
+            model="gpt-4o",  # the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+            messages=[
+                {"role": "system", "content": "You are a nutrition expert providing portion size guidance."},
+                {"role": "user", "content": prompt}
+            ],
+            response_format={"type": "json_object"},
+            max_tokens=200,
+            temperature=0.3
+        )
+        
+        result = json.loads(response.choices[0].message.content)
+        return result.get('unit_desc', f"1 serving (typical portion)")
+        
+    except Exception as e:
+        app.logger.error(f"Error getting AI portion description: {e}")
+        return f"1 serving (typical portion for {food_name})"
+
 @app.route('/portion-info', methods=['POST'])
 def portion_info():
     """Get portion information for a specific food item"""
@@ -613,7 +676,7 @@ def portion_info():
         
         data = request.get_json()
         
-        # Validate request structure
+        # Validate request structure  
         if not data or 'food' not in data:
             return jsonify({
                 'error': 'Invalid request format',
@@ -633,20 +696,42 @@ def portion_info():
         food_name_lower = food_name.lower()
         
         if food_name_lower in food_lookup:
+            # Food found in database
             food_item = food_lookup[food_name_lower]
             
             response = {
                 'food': food_name,
                 'unit': food_item['unit'],
-                'unit_desc': food_item['unit_desc']
+                'unit_desc': food_item['unit_desc'],
+                'source': 'database'
             }
             
             return jsonify(response)
         else:
-            response = {
-                'food': food_name,
-                'status': 'not_found'
-            }
+            # Food not in database - use hybrid approach
+            
+            # Step 1: Look for similar foods
+            similar_foods = find_similar_food_portions(food_name)
+            
+            if similar_foods:
+                # Use portion description from most similar food
+                unit_desc = similar_foods[0]['unit_desc']
+                response = {
+                    'food': food_name,
+                    'unit': 'serving',
+                    'unit_desc': unit_desc,
+                    'source': 'similar_food',
+                    'reference_food': similar_foods[0]['name']
+                }
+            else:
+                # Step 2: Fall back to AI-generated description
+                unit_desc = get_ai_portion_description(food_name)
+                response = {
+                    'food': food_name,
+                    'unit': 'serving', 
+                    'unit_desc': unit_desc,
+                    'source': 'ai_generated'
+                }
             
             return jsonify(response)
     
