@@ -588,6 +588,8 @@ Example response:
         
         # Parse the response
         gpt_response = response.choices[0].message.content
+        if not gpt_response:
+            return []
         suggestions_data = json.loads(gpt_response)
         
         if 'suggestions' in suggestions_data and isinstance(suggestions_data['suggestions'], list):
@@ -656,7 +658,10 @@ Keep it concise and practical. Return only JSON format: {{"unit_desc": "descript
             temperature=0.3
         )
         
-        result = json.loads(response.choices[0].message.content)
+        result_content = response.choices[0].message.content
+        if not result_content:
+            return f"1 serving (typical portion for {food_name})"
+        result = json.loads(result_content)
         return result.get('unit_desc', f"1 serving (typical portion)")
         
     except Exception as e:
