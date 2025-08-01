@@ -48,19 +48,31 @@ export const api = {
 
   // Smart meal parsing with database disambiguation
   async parseMealSmart(text: string) {
-    const response = await fetch(`${API_BASE}/parse-meal-smart`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ text }),
-    });
+    try {
+      console.log('API: Sending parseMealSmart request:', text);
+      const response = await fetch(`${API_BASE}/parse-meal-smart`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text }),
+      });
 
-    if (!response.ok) {
-      throw new Error(`Failed to parse meal: ${response.statusText}`);
+      console.log('API: parseMealSmart response status:', response.status);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('API: parseMealSmart error response:', errorText);
+        throw new Error(`Failed to parse meal: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      console.log('API: parseMealSmart result:', result);
+      return result;
+    } catch (error) {
+      console.error('API: parseMealSmart caught error:', error);
+      throw error;
     }
-
-    return response.json();
   },
 
   // Get portion information for a specific food
@@ -82,19 +94,31 @@ export const api = {
 
   // Calculate glycemic load for meal items
   async calculateGL(meal: ParsedMealItem[]): Promise<GLCalculationResult> {
-    const response = await fetch(`${API_BASE}/calculate-gl`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ meal }),
-    });
+    try {
+      console.log('API: Sending calculateGL request:', meal);
+      const response = await fetch(`${API_BASE}/calculate-gl`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ meal }),
+      });
 
-    if (!response.ok) {
-      throw new Error(`Failed to calculate GL: ${response.statusText}`);
+      console.log('API: calculateGL response status:', response.status);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('API: calculateGL error response:', errorText);
+        throw new Error(`Failed to calculate GL: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      console.log('API: calculateGL result:', result);
+      return result;
+    } catch (error) {
+      console.error('API: calculateGL caught error:', error);
+      throw error;
     }
-
-    return response.json();
   },
 
   // Health check

@@ -20,7 +20,10 @@ export const Home: React.FC = () => {
       setIsLoading(true);
       setError(null);
       
+      console.log('Home: Starting meal submission:', text);
       const result = await api.parseMealSmart(text);
+      console.log('Home: Parse result:', result);
+      
       if (result.status === 'success') {
         // Check if any food items were found
         if (!result.items || result.items.length === 0) {
@@ -34,6 +37,7 @@ export const Home: React.FC = () => {
         );
         
         if (needsDisambiguation) {
+          console.log('Home: Setting disambiguation items');
           setDisambiguationItems(result.items);
           setAppState('disambiguation');
         } else {
@@ -42,6 +46,7 @@ export const Home: React.FC = () => {
             food: item.status === 'single_match' ? item.selected_food : item.original_name,
             quantity: item.quantity
           }));
+          console.log('Home: Setting parsed meal:', finalMeal);
           setParsedMeal(finalMeal);
           setAppState('portions');
         }
@@ -49,6 +54,7 @@ export const Home: React.FC = () => {
         setError('No food items found in your description. Please describe your meal with specific foods like "2 rotis with dal" or "1 bowl rice with curry".');
       }
     } catch (err) {
+      console.error('Home: Error in handleMealSubmit:', err);
       setError(err instanceof Error ? err.message : 'No food items found in your description. Please describe your meal with specific foods like "2 rotis with dal" or "1 bowl rice with curry".');
     } finally {
       setIsLoading(false);
