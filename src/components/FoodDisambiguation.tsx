@@ -38,6 +38,10 @@ export const FoodDisambiguation: React.FC<FoodDisambiguationProps> = ({
         return { food: item.selected_food!, quantity: item.quantity };
       } else if (item.status === 'needs_disambiguation') {
         const selectedFood = selections[item.original_name];
+        if (selectedFood === 'ai-estimate') {
+          // User chose AI estimation over database matches
+          return { food: item.original_name, quantity: item.quantity };
+        }
         return { food: selectedFood || item.matches[0].name, quantity: item.quantity };
       } else {
         // needs_ai - pass through for AI estimation
@@ -121,6 +125,38 @@ export const FoodDisambiguation: React.FC<FoodDisambiguationProps> = ({
                       )}
                     </label>
                   ))}
+                  
+                  {/* AI Estimation Option */}
+                  <label className={`flex items-start space-x-4 p-4 rounded-xl cursor-pointer border-2 transition-all duration-200 hover:scale-[1.02] ${
+                    selections[item.original_name] === 'ai-estimate'
+                      ? 'bg-gradient-to-r from-purple-50 to-blue-50 border-purple-300 shadow-lg'
+                      : 'bg-gradient-to-r from-purple-25 to-blue-25 border-dashed border-purple-200 hover:bg-gradient-to-r hover:from-purple-50 hover:to-blue-50 hover:border-purple-300 hover:shadow-md'
+                  }`}>
+                    <input
+                      type="radio"
+                      name={`food_${index}`}
+                      value="ai-estimate"
+                      checked={selections[item.original_name] === 'ai-estimate'}
+                      onChange={() => handleSelection(item.original_name, 'ai-estimate')}
+                      className="mt-1 w-5 h-5 text-purple-600 focus:ring-purple-500 border-gray-300"
+                    />
+                    <div className="flex-1">
+                      <div className="font-semibold text-purple-900 text-lg mb-2 flex items-center">
+                        <span className="mr-2">🤖</span>
+                        None of these - Use AI to estimate
+                      </div>
+                      <div className="text-sm text-purple-600 flex items-center space-x-2">
+                        <span className="bg-purple-100 px-3 py-1 rounded-full font-medium">AI Powered</span>
+                        <span>•</span>
+                        <span>Let AI analyze "{item.original_name}" nutritional data</span>
+                      </div>
+                    </div>
+                    {selections[item.original_name] === 'ai-estimate' && (
+                      <div className="text-purple-600 animate-bounce text-xl">
+                        🤖
+                      </div>
+                    )}
+                  </label>
                 </div>
               )}
 
