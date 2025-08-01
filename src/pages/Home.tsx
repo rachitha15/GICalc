@@ -71,10 +71,13 @@ export const Home: React.FC = () => {
       setIsLoading(true);
       setError(null);
       
+      console.log('Calculating GL for meal:', parsedMeal);
       const result = await api.calculateGL(parsedMeal);
+      console.log('GL calculation result:', result);
       setGLResult(result);
       setAppState('results');
     } catch (err) {
+      console.error('GL calculation error:', err);
       setError(err instanceof Error ? err.message : 'Failed to calculate GL');
     } finally {
       setIsLoading(false);

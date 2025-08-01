@@ -27,10 +27,10 @@ def load_food_database():
     """Load food database from JSON file on startup"""
     global food_database, food_lookup
     
+    # Try to load from the uploaded file path
+    json_file_path = 'attached_assets/food_items_db_1753605645874.json'
+    
     try:
-        # Try to load from the uploaded file path
-        json_file_path = 'attached_assets/food_items_db_1753605645874.json'
-        
         with open(json_file_path, 'r', encoding='utf-8') as file:
             food_database = json.load(file)
         
