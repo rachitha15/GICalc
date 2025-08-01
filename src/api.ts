@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:5000'; // Backend API URL
+const API_BASE = ''; // Use relative URLs since frontend and backend are served from same domain
 
 export interface ParsedMealItem {
   food: string;
@@ -28,8 +28,9 @@ export interface GLCalculationResult {
   suggestions?: MealSuggestion[];
 }
 
-// Export individual functions
-export async function parseMealChat(text: string): Promise<ParsedMealItem[]> {
+export const api = {
+  // Parse natural language meal description
+  async parseMealChat(text: string): Promise<ParsedMealItem[]> {
     const response = await fetch(`${API_BASE}/parse-meal-chat`, {
       method: 'POST',
       headers: {
@@ -43,9 +44,10 @@ export async function parseMealChat(text: string): Promise<ParsedMealItem[]> {
     }
 
     return response.json();
-}
+  },
 
-export async function parseMealSmart(text: string) {
+  // Smart meal parsing with database disambiguation
+  async parseMealSmart(text: string) {
     const response = await fetch(`${API_BASE}/parse-meal-smart`, {
       method: 'POST',
       headers: {
@@ -59,9 +61,10 @@ export async function parseMealSmart(text: string) {
     }
 
     return response.json();
-}
+  },
 
-export async function getPortionInfo(food: string): Promise<PortionInfo> {
+  // Get portion information for a specific food
+  async getPortionInfo(food: string): Promise<PortionInfo> {
     const response = await fetch(`${API_BASE}/portion-info`, {
       method: 'POST',
       headers: {
@@ -75,9 +78,10 @@ export async function getPortionInfo(food: string): Promise<PortionInfo> {
     }
 
     return response.json();
-}
+  },
 
-export async function calculateGL(meal: ParsedMealItem[]): Promise<GLCalculationResult> {
+  // Calculate glycemic load for meal items
+  async calculateGL(meal: ParsedMealItem[]): Promise<GLCalculationResult> {
     const response = await fetch(`${API_BASE}/calculate-gl`, {
       method: 'POST',
       headers: {
@@ -91,9 +95,10 @@ export async function calculateGL(meal: ParsedMealItem[]): Promise<GLCalculation
     }
 
     return response.json();
-}
+  },
 
-export async function healthCheck(): Promise<{ status: string; message: string }> {
+  // Health check
+  async healthCheck(): Promise<{ status: string; message: string }> {
     const response = await fetch(`${API_BASE}/health`);
     
     if (!response.ok) {
@@ -101,4 +106,5 @@ export async function healthCheck(): Promise<{ status: string; message: string }
     }
 
     return response.json();
-}
+  },
+};
