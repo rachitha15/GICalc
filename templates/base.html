@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>{% block title %}Glycemic AI{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#4913ec",
+                        "primary-light": "#7c4dff",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#151022",
+                        "surface-dark": "#2c2348",
+                        "text-dim": "#a092c9",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"],
+                        "body": ["Noto Sans", "sans-serif"],
+                    },
+                    borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+    {% block head %}{% endblock %}
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display antialiased overflow-x-hidden">
+    <div class="relative flex min-h-screen w-full flex-col">
+        <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+            <div class="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] rounded-full bg-primary/20 blur-[120px]"></div>
+            <div class="absolute bottom-[-20%] right-[-10%] w-[800px] h-[800px] rounded-full bg-blue-600/10 blur-[150px]"></div>
+            <div class="absolute top-[30%] right-[10%] w-[300px] h-[300px] rounded-full bg-pink-600/10 blur-[100px]"></div>
+        </div>
+
+        <header class="relative z-10 flex items-center justify-between whitespace-nowrap px-6 lg:px-10 py-4 lg:py-6">
+            <a href="/" class="flex items-center gap-3 text-gray-900 dark:text-white cursor-pointer hover:opacity-80 transition-opacity">
+                <div class="size-8 flex items-center justify-center rounded-lg bg-primary/20 text-primary">
+                    <span class="material-symbols-outlined text-[24px]">network_intelligence</span>
+                </div>
+                <h2 class="text-xl font-bold leading-tight tracking-tight">Glycemic AI</h2>
+            </a>
+            <div class="flex items-center gap-4">
+                {% block header_right %}{% endblock %}
+            </div>
+        </header>
+
+        <main class="relative z-10 flex flex-1 flex-col items-center justify-center px-4 py-8 lg:px-20">
+            {% block content %}{% endblock %}
+        </main>
+
+        {% block footer %}{% endblock %}
+    </div>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

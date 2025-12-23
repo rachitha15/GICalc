@@ -3,7 +3,7 @@ import json
 import logging
 from datetime import datetime, timedelta
 from functools import wraps
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase
@@ -1057,6 +1057,34 @@ def portion_info():
             'error': 'Internal server error',
             'message': 'An unexpected error occurred while processing your request'
         }), 500
+
+
+# ============================================
+# PAGE ROUTES (serve templates)
+# ============================================
+
+@app.route('/')
+def index():
+    """Redirect to register page"""
+    return render_template('register.html')
+
+
+@app.route('/register')
+def register_page():
+    """Registration page"""
+    return render_template('register.html')
+
+
+@app.route('/login')
+def login_page():
+    """Login page"""
+    return render_template('login.html')
+
+
+@app.route('/dashboard')
+def dashboard_page():
+    """Dashboard page (placeholder for now)"""
+    return render_template('dashboard.html')
 
 
 # ============================================
