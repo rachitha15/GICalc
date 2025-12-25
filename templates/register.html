@@ -88,18 +88,6 @@
                         </div>
                     </label>
 
-                    <div class="flex items-center gap-2 mt-1">
-                        <input 
-                            id="terms"
-                            type="checkbox" 
-                            required
-                            class="rounded bg-white/50 dark:bg-background-dark/50 border-gray-300 dark:border-white/20 text-primary focus:ring-offset-background-dark focus:ring-primary"
-                        />
-                        <label class="text-xs text-gray-600 dark:text-text-dim" for="terms">
-                            I agree to the <a class="text-primary hover:text-primary-light hover:underline" href="#">Terms of Service</a> and <a class="text-primary hover:text-primary-light hover:underline" href="#">Privacy Policy</a>.
-                        </label>
-                    </div>
-
                     <button 
                         id="submit-btn"
                         type="submit" 
@@ -132,7 +120,6 @@ document.getElementById('register-form').addEventListener('submit', async functi
     
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
-    const terms = document.getElementById('terms').checked;
     
     const errorDiv = document.getElementById('error-message');
     const successDiv = document.getElementById('success-message');
@@ -143,12 +130,6 @@ document.getElementById('register-form').addEventListener('submit', async functi
     
     errorDiv.classList.add('hidden');
     successDiv.classList.add('hidden');
-    
-    if (!terms) {
-        errorDiv.textContent = 'Please agree to the Terms of Service and Privacy Policy.';
-        errorDiv.classList.remove('hidden');
-        return;
-    }
     
     if (password.length < 6) {
         errorDiv.textContent = 'Password must be at least 6 characters.';
