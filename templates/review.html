@@ -474,6 +474,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (response.ok) {
                     localStorage.setItem('glResult', JSON.stringify(data));
                     localStorage.removeItem('parsedMeal');
+                    window.location.href = '/results';
+                    return;
                 } else {
                     errorDiv.textContent = data.message || 'Failed to calculate glycemic load.';
                     errorDiv.classList.remove('hidden');

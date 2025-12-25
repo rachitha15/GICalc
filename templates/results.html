@@ -1,0 +1,337 @@
+{% extends "base.html" %}
+
+{% block title %}Meal Analysis - Glycemic Guide AI{% endblock %}
+
+{% block header_right %}
+<button id="logout-btn" class="text-gray-600 dark:text-white text-sm font-medium hover:underline">Log Out</button>
+{% endblock %}
+
+{% block content %}
+<style>
+    .glass-card {
+        background: rgba(26, 20, 46, 0.6);
+        backdrop-filter: blur(16px);
+        border: 1px solid rgba(168, 85, 247, 0.15);
+    }
+    .gl-ring {
+        position: relative;
+        width: 180px;
+        height: 180px;
+    }
+    .gl-ring-bg {
+        stroke: rgba(255,255,255,0.05);
+        fill: none;
+        stroke-width: 14;
+    }
+    .gl-ring-progress {
+        fill: none;
+        stroke-width: 14;
+        stroke-linecap: round;
+        transform: rotate(-90deg);
+        transform-origin: center;
+        transition: stroke-dashoffset 1s ease-out;
+    }
+    .gl-low { stroke: #10b981; }
+    .gl-medium { stroke: #f59e0b; }
+    .gl-high { stroke: #ef4444; }
+    .progress-bar-low { background: linear-gradient(to right, #10b981, #34d399); }
+    .progress-bar-medium { background: linear-gradient(to right, #f59e0b, #fbbf24); }
+    .progress-bar-high { background: linear-gradient(to right, #ef4444, #f97316); }
+</style>
+
+<div class="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
+    <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-primary/20 blur-[120px]"></div>
+    <div class="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] rounded-full bg-primary/10 blur-[100px]"></div>
+</div>
+
+<div class="flex flex-col w-full max-w-7xl mx-auto gap-6 pb-24">
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 pt-2">
+        <div>
+            <h1 class="text-3xl md:text-5xl font-bold text-white tracking-tight mb-2">Meal Analysis</h1>
+            <div class="flex items-center gap-2 text-white/50 text-sm">
+                <span class="material-symbols-outlined text-sm">schedule</span>
+                <span id="meal-timestamp"></span>
+            </div>
+        </div>
+    </div>
+
+    <div id="error-message" class="hidden bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-xl text-sm"></div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div class="lg:col-span-7 flex flex-col gap-8">
+            <div id="total-gl-card" class="relative overflow-hidden rounded-[2rem] bg-[#1a1429]/50 backdrop-blur-md border border-white/5 p-8 shadow-xl">
+                <div class="flex flex-col sm:flex-row items-center gap-10">
+                    <div class="gl-ring flex-shrink-0">
+                        <svg viewBox="0 0 180 180" class="w-full h-full">
+                            <circle cx="90" cy="90" r="76" class="gl-ring-bg"></circle>
+                            <circle id="gl-ring-progress" cx="90" cy="90" r="76" class="gl-ring-progress gl-high" stroke-dasharray="478" stroke-dashoffset="478"></circle>
+                        </svg>
+                        <div class="absolute inset-0 flex flex-col items-center justify-center">
+                            <span id="total-gl-value" class="text-6xl font-bold text-white tracking-tighter">0</span>
+                            <span class="text-[10px] font-bold uppercase tracking-widest text-white/50 mt-1">Total GL</span>
+                        </div>
+                    </div>
+                    <div class="flex-1 text-center sm:text-left">
+                        <div id="gl-badge" class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-bold mb-4 border">
+                            <span class="material-symbols-outlined text-lg" id="gl-badge-icon">check_circle</span>
+                            <span id="gl-badge-text">Low Glycemic Load</span>
+                        </div>
+                        <h3 id="gl-zone-title" class="text-3xl font-bold mb-2 tracking-tight text-white">Optimal Zone</h3>
+                        <p id="gl-zone-description" class="text-white/60 leading-relaxed text-sm"></p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="success-message" class="hidden bg-green-500/10 border border-green-500/30 rounded-2xl p-6 text-center">
+                <span class="material-symbols-outlined text-5xl text-green-400 mb-3">celebration</span>
+                <h3 class="text-xl font-bold text-green-400 mb-2">Great Choice!</h3>
+                <p class="text-white/70">Your meal has a low glycemic impact. Keep making healthy choices!</p>
+            </div>
+
+            <div>
+                <h3 class="text-xl font-bold mb-4 flex items-center gap-3 px-1 text-white">
+                    <span class="material-symbols-outlined text-primary">pie_chart</span>
+                    Glycemic Breakdown
+                </h3>
+                <div id="breakdown-list" class="space-y-4">
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-5 flex flex-col gap-6">
+            <div id="ai-recommendations" class="hidden glass-card rounded-[2rem] p-6 relative overflow-hidden">
+                <div class="absolute -top-10 -right-10 p-4 opacity-[0.05] rotate-12">
+                    <span class="material-symbols-outlined text-9xl text-white">psychology</span>
+                </div>
+                <div class="flex items-center gap-3 mb-6 relative z-10">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-[#a855f7] flex items-center justify-center shadow-lg shadow-primary/30 ring-2 ring-white/10">
+                        <span class="material-symbols-outlined text-white text-lg animate-pulse">auto_awesome</span>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-[#a855f7]">AI Recommendations</h3>
+                        <p class="text-xs text-white/50 font-medium">Optimization for High GL Meal</p>
+                    </div>
+                </div>
+                <div id="suggestions-list" class="space-y-4 relative z-10">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="fixed bottom-6 right-6 z-50">
+        <button id="next-meal-btn" class="flex items-center gap-2 px-6 py-4 rounded-full bg-gradient-to-r from-primary to-[#7c4dff] text-white font-bold shadow-xl shadow-primary/30 hover:shadow-primary/50 hover:scale-105 transition-all">
+            <span class="material-symbols-outlined">add</span>
+            Calculate Glycemic Load for next meal
+        </button>
+    </div>
+</div>
+
+<footer class="border-t border-white/5 py-6 mt-auto">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div class="flex items-center gap-2 text-white/40 text-sm">
+            <span class="material-symbols-outlined text-sm">eco</span>
+            <span>&copy; 2025 GlycemicAI. Empowering healthier choices.</span>
+        </div>
+        <div class="flex gap-6 text-white/40 text-sm">
+            <a href="#" class="hover:text-white transition-colors">Privacy</a>
+            <a href="#" class="hover:text-white transition-colors">Terms</a>
+            <a href="#" class="hover:text-white transition-colors">Support</a>
+        </div>
+    </div>
+</footer>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const token = localStorage.getItem('token');
+    
+    if (!token) {
+        window.location.href = '/login';
+        return;
+    }
+    
+    const glResultData = localStorage.getItem('glResult');
+    if (!glResultData) {
+        window.location.href = '/dashboard';
+        return;
+    }
+    
+    let result;
+    try {
+        result = JSON.parse(glResultData);
+    } catch (e) {
+        window.location.href = '/dashboard';
+        return;
+    }
+    
+    const totalGl = result.total_gl || 0;
+    const items = result.items || [];
+    const suggestions = result.suggestions || [];
+    
+    const now = new Date();
+    const hours = now.getHours();
+    let mealType = 'Snack';
+    if (hours >= 6 && hours < 11) mealType = 'Breakfast';
+    else if (hours >= 11 && hours < 15) mealType = 'Lunch';
+    else if (hours >= 15 && hours < 18) mealType = 'Snack';
+    else if (hours >= 18 && hours < 22) mealType = 'Dinner';
+    
+    const timeStr = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+    document.getElementById('meal-timestamp').textContent = `${mealType} • Today, ${timeStr}`;
+    
+    const totalGlValue = document.getElementById('total-gl-value');
+    const glRingProgress = document.getElementById('gl-ring-progress');
+    const glBadge = document.getElementById('gl-badge');
+    const glBadgeIcon = document.getElementById('gl-badge-icon');
+    const glBadgeText = document.getElementById('gl-badge-text');
+    const glZoneTitle = document.getElementById('gl-zone-title');
+    const glZoneDescription = document.getElementById('gl-zone-description');
+    const successMessage = document.getElementById('success-message');
+    const aiRecommendations = document.getElementById('ai-recommendations');
+    
+    totalGlValue.textContent = Math.round(totalGl);
+    
+    const circumference = 2 * Math.PI * 76;
+    const maxGl = 60;
+    const progress = Math.min(totalGl / maxGl, 1);
+    const offset = circumference * (1 - progress);
+    
+    setTimeout(() => {
+        glRingProgress.style.strokeDashoffset = offset;
+    }, 100);
+    
+    if (totalGl <= 10) {
+        glRingProgress.classList.remove('gl-medium', 'gl-high');
+        glRingProgress.classList.add('gl-low');
+        glBadge.className = 'inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-bold mb-4 border bg-green-500/10 text-green-400 border-green-500/20';
+        glBadgeIcon.textContent = 'check_circle';
+        glBadgeText.textContent = 'Low Glycemic Load';
+        glZoneTitle.textContent = 'Optimal Zone';
+        glZoneDescription.textContent = 'Excellent! This meal has minimal impact on blood sugar levels. Perfect for maintaining stable energy throughout the day.';
+        successMessage.classList.remove('hidden');
+        totalGlValue.classList.add('text-green-400');
+    } else if (totalGl <= 19) {
+        glRingProgress.classList.remove('gl-low', 'gl-high');
+        glRingProgress.classList.add('gl-medium');
+        glBadge.className = 'inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-bold mb-4 border bg-yellow-500/10 text-yellow-400 border-yellow-500/20';
+        glBadgeIcon.textContent = 'info';
+        glBadgeText.textContent = 'Moderate Glycemic Load';
+        glZoneTitle.textContent = 'Moderate Zone';
+        glZoneDescription.textContent = 'This meal has a moderate impact on blood sugar. Consider the suggestions below to optimize your meal.';
+        aiRecommendations.classList.remove('hidden');
+        totalGlValue.classList.add('text-yellow-400');
+    } else {
+        glRingProgress.classList.remove('gl-low', 'gl-medium');
+        glRingProgress.classList.add('gl-high');
+        glBadge.className = 'inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-bold mb-4 border bg-red-500/10 text-red-400 border-red-500/20 animate-pulse';
+        glBadgeIcon.textContent = 'warning';
+        glBadgeText.textContent = 'High Glycemic Load';
+        glZoneTitle.textContent = 'Caution Zone';
+        glZoneDescription.textContent = 'This meal has a significant impact on blood sugar (GL ≥ 20). The high proportion of simple carbohydrates is driving the spike.';
+        aiRecommendations.classList.remove('hidden');
+        totalGlValue.classList.add('text-red-400');
+    }
+    
+    const breakdownList = document.getElementById('breakdown-list');
+    const maxItemGl = Math.max(...items.map(i => i.gl || 0), 30);
+    
+    const colors = ['#6366f1', '#a855f7', '#ec4899', '#f59e0b', '#10b981', '#3b82f6'];
+    
+    breakdownList.innerHTML = items.map((item, index) => {
+        const gl = item.gl || 0;
+        const isAiEstimated = item.status === 'ai_estimated';
+        const percentage = Math.min((gl / maxItemGl) * 100, 100);
+        
+        let glClass, borderClass, progressClass;
+        if (gl <= 10) {
+            glClass = 'bg-green-500/10 text-green-400 border-green-500/20';
+            borderClass = 'border-green-500/20 hover:border-green-500/50';
+            progressClass = 'progress-bar-low';
+        } else if (gl <= 19) {
+            glClass = 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20';
+            borderClass = 'border-yellow-500/20 hover:border-yellow-500/50';
+            progressClass = 'progress-bar-medium';
+        } else {
+            glClass = 'bg-red-500/10 text-red-400 border-red-500/20';
+            borderClass = 'border-red-500/20 hover:border-red-500/50';
+            progressClass = 'progress-bar-high';
+        }
+        
+        const circleColor = colors[index % colors.length];
+        
+        return `
+            <div class="group relative flex items-center gap-5 p-4 rounded-2xl bg-[#1a1429]/50 backdrop-blur-md border ${borderClass} transition-all shadow-sm hover:shadow-lg">
+                <div class="w-16 h-16 rounded-xl flex-shrink-0 flex items-center justify-center" style="background-color: ${circleColor}20; border: 1px solid ${circleColor}40;">
+                    <span class="material-symbols-outlined text-2xl" style="color: ${circleColor};">restaurant</span>
+                </div>
+                <div class="flex-1 min-w-0 py-1">
+                    <div class="flex justify-between items-start mb-1">
+                        <div class="flex items-center gap-2">
+                            <h4 class="font-bold text-lg truncate text-white">${item.food}</h4>
+                            ${isAiEstimated ? `
+                                <span class="inline-flex items-center gap-1 bg-gradient-to-r from-primary/10 to-[#a855f7]/10 text-primary px-2 py-0.5 rounded-md text-[10px] font-bold border border-primary/20">
+                                    <span class="material-symbols-outlined text-[10px]">auto_awesome</span>
+                                    ai_estimated
+                                </span>
+                            ` : ''}
+                        </div>
+                        <span class="inline-flex items-center justify-center px-2.5 py-0.5 rounded-lg ${glClass} text-xs font-bold border whitespace-nowrap">
+                            GL: ${Math.round(gl)}
+                        </span>
+                    </div>
+                    <p class="text-xs font-medium text-white/40">${item.quantity || 1} ${item.unit || 'serving'}${!isAiEstimated ? ' • Database' : ''}</p>
+                    <div class="w-full bg-white/5 rounded-full h-2 mt-2 overflow-hidden">
+                        <div class="${progressClass} h-full rounded-full transition-all duration-1000" style="width: ${percentage}%;"></div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    if (suggestions.length > 0 && totalGl >= 11) {
+        const suggestionsList = document.getElementById('suggestions-list');
+        
+        suggestionsList.innerHTML = suggestions.map((suggestion, index) => {
+            const text = suggestion.text || suggestion;
+            const reason = suggestion.reason || '';
+            
+            const isPortionAdvice = text.toLowerCase().includes('reduce') || text.toLowerCase().includes('portion') || text.toLowerCase().includes('half');
+            const iconName = isPortionAdvice ? 'scale' : 'swap_horiz';
+            const iconColor = isPortionAdvice ? 'text-primary' : 'text-green-400';
+            const labelText = isPortionAdvice ? 'Portion Control' : 'Food Swap';
+            const borderColor = isPortionAdvice ? 'border-primary/20' : 'border-green-500/20';
+            
+            return `
+                <div class="bg-white/5 rounded-2xl p-4 border ${borderColor} backdrop-blur-sm">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="material-symbols-outlined ${iconColor} text-sm">${iconName}</span>
+                        <span class="text-xs font-bold uppercase tracking-wider ${iconColor}">${labelText}</span>
+                    </div>
+                    <p class="text-sm leading-relaxed mb-2 text-white/90">${text}</p>
+                    ${reason ? `
+                        <div class="bg-primary/5 p-2 rounded-lg border-l-2 border-primary">
+                            <p class="text-xs text-white/50 italic">
+                                <span class="font-bold not-italic text-white/70">Why?</span> ${reason}
+                            </p>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }).join('');
+    }
+    
+    document.getElementById('next-meal-btn').addEventListener('click', function() {
+        localStorage.removeItem('glResult');
+        localStorage.removeItem('parsedMeal');
+        localStorage.removeItem('originalMealText');
+        window.location.href = '/dashboard';
+    });
+    
+    document.getElementById('logout-btn').addEventListener('click', function() {
+        localStorage.clear();
+        window.location.href = '/login';
+    });
+});
+</script>
+{% endblock %}

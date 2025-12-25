@@ -702,6 +702,8 @@ def calculate_gl():
                 continue
             
             food_name_lower = food_name.lower()
+            unit = meal_item.get('unit', 'serving')
+            source = meal_item.get('source', 'database')
             
             if food_name_lower in food_lookup:
                 food_item = food_lookup[food_name_lower]
@@ -710,7 +712,10 @@ def calculate_gl():
                 
                 items.append({
                     'food': food_name,
-                    'gl': gl
+                    'gl': gl,
+                    'quantity': quantity,
+                    'unit': unit,
+                    'source': source
                 })
             else:
                 ai_nutrition = get_nutrition_from_ai(food_name)
@@ -722,11 +727,15 @@ def calculate_gl():
                     items.append({
                         'food': food_name,
                         'gl': gl,
+                        'quantity': quantity,
+                        'unit': unit,
                         'status': 'ai_estimated'
                     })
                 else:
                     items.append({
                         'food': food_name,
+                        'quantity': quantity,
+                        'unit': unit,
                         'status': 'not_found'
                     })
         
@@ -1195,6 +1204,12 @@ def dashboard_page():
 def review_page():
     """Disambiguation/Review meal page"""
     return render_template('review.html')
+
+
+@app.route('/results')
+def results_page():
+    """Meal analysis results page"""
+    return render_template('results.html')
 
 
 # ============================================
