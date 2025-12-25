@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Glycemic Guide AI - Meal Input</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#4913ec",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#151022",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        @keyframes breathe {
+            0%, 100% { opacity: 0.4; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.1); }
+        }
+        .animate-breathe {
+            animation: breathe 8s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+        }
+        .animate-float {
+            animation: float 4s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-white min-h-screen relative overflow-x-hidden selection:bg-primary selection:text-white">
+<div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+<div class="absolute -top-[20%] -left-[10%] w-[600px] h-[600px] bg-primary/20 blur-[120px] rounded-full animate-breathe"></div>
+<div class="absolute top-[40%] -right-[20%] w-[500px] h-[500px] bg-blue-600/10 blur-[100px] rounded-full animate-breathe" style="animation-delay: 2s;"></div>
+</div>
+<div class="relative z-10 w-full max-w-[540px] mx-auto min-h-screen flex flex-col p-4 md:p-6">
+<header class="flex items-center justify-between py-4 mb-2">
+<div class="flex items-center gap-3">
+<div class="flex items-center justify-center size-10 rounded-full bg-primary/20 text-primary border border-primary/30 shadow-[0_0_15px_rgba(73,19,236,0.3)]">
+<span class="material-symbols-outlined text-2xl">local_dining</span>
+</div>
+<div>
+<h1 class="text-lg font-bold leading-tight tracking-tight">Glycemic Guide AI</h1>
+<p class="text-xs text-gray-500 dark:text-gray-400 font-medium">Smart Food Tracker</p>
+</div>
+</div>
+</header>
+<main class="flex-1 flex flex-col justify-center gap-6 pb-6">
+<div class="w-full flex items-center justify-between bg-white/60 dark:bg-[#1e1730]/60 backdrop-blur-md border border-gray-200 dark:border-[#3f3267] rounded-3xl p-4 shadow-lg shadow-indigo-500/5 relative overflow-hidden animate-float transition-transform hover:scale-[1.02] duration-300">
+<div class="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none"></div>
+<div class="flex flex-col gap-1 relative z-10">
+<span class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">Daily Meal Limit</span>
+<div class="flex items-baseline gap-1.5">
+<span class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-500">3</span>
+<span class="text-sm font-medium text-gray-500 dark:text-gray-400">/ 4 meals left</span>
+</div>
+</div>
+<div class="flex items-center gap-2 relative z-10">
+<div class="group/cell relative w-4 h-10 rounded-full bg-gray-200 dark:bg-white/5 border border-gray-300 dark:border-white/10 overflow-hidden">
+<div class="absolute bottom-0 left-0 right-0 h-[20%] bg-gray-400/30 dark:bg-gray-500/30"></div>
+</div>
+<div class="relative w-4 h-10 rounded-full bg-gray-900 overflow-hidden shadow-[0_0_12px_rgba(73,19,236,0.5)] border border-primary/30">
+<div class="absolute inset-0 bg-gradient-to-t from-primary via-blue-600 to-indigo-400 animate-pulse"></div>
+<div class="absolute top-1 right-1 w-1 h-1 bg-white/50 rounded-full blur-[1px]"></div>
+</div>
+<div class="relative w-4 h-10 rounded-full bg-gray-900 overflow-hidden shadow-[0_0_8px_rgba(73,19,236,0.3)] border border-primary/20 opacity-90">
+<div class="absolute inset-0 bg-gradient-to-t from-primary via-blue-600 to-indigo-400"></div>
+<div class="absolute top-1 right-1 w-1 h-1 bg-white/50 rounded-full blur-[1px]"></div>
+</div>
+<div class="relative w-4 h-10 rounded-full bg-gray-900 overflow-hidden shadow-[0_0_8px_rgba(73,19,236,0.3)] border border-primary/20 opacity-80">
+<div class="absolute inset-0 bg-gradient-to-t from-primary via-blue-600 to-indigo-400"></div>
+<div class="absolute top-1 right-1 w-1 h-1 bg-white/50 rounded-full blur-[1px]"></div>
+</div>
+</div>
+</div>
+<div class="text-center space-y-2 mt-2">
+<h2 class="text-3xl md:text-4xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-b from-gray-900 to-gray-600 dark:from-white dark:to-white/70">
+                    What's on your<br/>plate today?
+                </h2>
+<p class="text-base text-gray-500 dark:text-gray-400">
+                    I'll analyze the glycemic impact for you.
+                </p>
+</div>
+<div class="group relative rounded-[2rem] bg-white dark:bg-[#1e1730] border border-gray-200 dark:border-[#3f3267] shadow-xl dark:shadow-2xl dark:shadow-primary/5 overflow-hidden transition-all focus-within:ring-4 focus-within:ring-primary/20 focus-within:border-primary">
+<div class="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent opacity-0 group-focus-within:opacity-100 transition-opacity pointer-events-none"></div>
+<div class="relative flex flex-col h-64 p-5">
+<textarea autofocus="" class="w-full flex-1 bg-transparent border-0 p-0 text-xl md:text-2xl text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:ring-0 resize-none font-medium leading-relaxed" placeholder="I had 2 rotis, a bowl of yellow dal, and some dahi..."></textarea>
+<div class="flex justify-between items-end pt-4">
+<button class="flex items-center justify-center size-10 rounded-full text-gray-400 hover:text-primary hover:bg-primary/10 transition-colors" title="Use Microphone">
+<span class="material-symbols-outlined">mic</span>
+</button>
+<span class="text-xs font-bold text-gray-400 uppercase tracking-widest opacity-50">AI Ready</span>
+</div>
+</div>
+</div>
+<div class="space-y-3">
+<p class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-2">Quick Add</p>
+<div class="flex flex-wrap gap-2.5">
+<button class="flex h-9 items-center gap-1.5 px-4 rounded-full bg-white dark:bg-[#2c2348] border border-gray-200 dark:border-[#3f3267] hover:border-primary dark:hover:border-primary hover:bg-primary/5 dark:hover:bg-primary/20 text-sm font-medium transition-all hover:-translate-y-0.5 active:scale-95 group">
+<span class="material-symbols-outlined text-[18px] text-gray-400 group-hover:text-primary">add</span>
+                        Roti
+                    </button>
+<button class="flex h-9 items-center gap-1.5 px-4 rounded-full bg-white dark:bg-[#2c2348] border border-gray-200 dark:border-[#3f3267] hover:border-primary dark:hover:border-primary hover:bg-primary/5 dark:hover:bg-primary/20 text-sm font-medium transition-all hover:-translate-y-0.5 active:scale-95 group">
+<span class="material-symbols-outlined text-[18px] text-gray-400 group-hover:text-primary">add</span>
+                        Rice
+                    </button>
+<button class="flex h-9 items-center gap-1.5 px-4 rounded-full bg-white dark:bg-[#2c2348] border border-gray-200 dark:border-[#3f3267] hover:border-primary dark:hover:border-primary hover:bg-primary/5 dark:hover:bg-primary/20 text-sm font-medium transition-all hover:-translate-y-0.5 active:scale-95 group">
+<span class="material-symbols-outlined text-[18px] text-gray-400 group-hover:text-primary">add</span>
+                        Dal
+                    </button>
+<button class="flex h-9 items-center gap-1.5 px-4 rounded-full bg-white dark:bg-[#2c2348] border border-gray-200 dark:border-[#3f3267] hover:border-primary dark:hover:border-primary hover:bg-primary/5 dark:hover:bg-primary/20 text-sm font-medium transition-all hover:-translate-y-0.5 active:scale-95 group">
+<span class="material-symbols-outlined text-[18px] text-gray-400 group-hover:text-primary">add</span>
+                        Paneer
+                    </button>
+<button class="flex h-9 items-center gap-1.5 px-4 rounded-full bg-white dark:bg-[#2c2348] border border-gray-200 dark:border-[#3f3267] hover:border-primary dark:hover:border-primary hover:bg-primary/5 dark:hover:bg-primary/20 text-sm font-medium transition-all hover:-translate-y-0.5 active:scale-95 group">
+<span class="material-symbols-outlined text-[18px] text-gray-400 group-hover:text-primary">add</span>
+                        Chai
+                    </button>
+<button class="flex h-9 items-center gap-1.5 px-4 rounded-full bg-white dark:bg-[#2c2348] border border-gray-200 dark:border-[#3f3267] hover:border-primary dark:hover:border-primary hover:bg-primary/5 dark:hover:bg-primary/20 text-sm font-medium transition-all hover:-translate-y-0.5 active:scale-95 group">
+<span class="material-symbols-outlined text-[18px] text-gray-400 group-hover:text-primary">add</span>
+                        Dosa
+                    </button>
+</div>
+</div>
+<button class="relative w-full group overflow-hidden rounded-full p-[2px] focus:outline-none focus:ring-4 focus:ring-primary/30 mt-4 active:scale-[0.98] transition-transform">
+<span class="absolute inset-0 bg-gradient-to-r from-primary via-[#7c4dff] to-primary animate-breathe opacity-80"></span>
+<div class="relative flex items-center justify-center gap-2 h-14 w-full rounded-full bg-primary hover:bg-transparent hover:bg-gradient-to-r hover:from-primary hover:to-[#6020f0] transition-all">
+<span class="text-white text-lg font-bold tracking-wide">Calculate Glycemic Load</span>
+<span class="material-symbols-outlined text-white group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</div>
+</button>
+<p class="text-center text-xs text-gray-500 dark:text-gray-400 px-6 leading-relaxed">
+                Tip: You can enter multiple items at once. I'll separate them and calculate the total load automatically.
+            </p>
+</main>
+</div>
+</body></html>
