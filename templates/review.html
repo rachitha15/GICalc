@@ -98,12 +98,16 @@
                         <h3 class="text-sm font-bold text-white/70 uppercase tracking-wider mb-2">Adjust Portion</h3>
                         <div class="bg-[#201933]/70 backdrop-blur-md rounded-2xl p-6 flex flex-col gap-6 border border-white/5">
                             <div class="text-center">
-                                <span id="portion-value" class="text-4xl font-bold text-white">1.0</span>
-                                <span id="portion-unit" class="text-xl text-white/60 ml-2">serving</span>
-                                <p id="portion-grams" class="text-green-400 text-sm mt-1">~150 grams</p>
+                                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#2c2348]/50 border border-white/10 hover:border-primary/50 transition-colors cursor-text group" onclick="document.getElementById('portion-input').focus()">
+                                    <input type="number" id="portion-input" min="0.1" max="10" step="0.1" value="1.0" class="w-20 text-4xl font-bold text-white bg-transparent text-center focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+                                    <span id="portion-unit" class="text-xl text-white/60">serving</span>
+                                    <span class="material-symbols-outlined text-white/40 group-hover:text-primary transition-colors">edit</span>
+                                </div>
+                                <p id="portion-grams" class="text-green-400 text-sm mt-2">~150 grams</p>
+                                <p class="text-white/30 text-xs mt-1">Tap to type custom amount</p>
                             </div>
 
-                            <input type="range" id="portion-slider" min="0.5" max="2" step="0.1" value="1" class="w-full">
+                            <input type="range" id="portion-slider" min="0.1" max="4" step="0.1" value="1" class="w-full">
 
                             <div class="flex justify-center gap-2">
                                 <button data-size="0.5" class="size-btn px-4 py-2 rounded-lg bg-[#2c2348] text-white/60 text-sm font-medium hover:bg-primary/20 hover:text-white transition-all">Small</button>
@@ -171,7 +175,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const optionsContainer = document.getElementById('options-container');
     const detailSubtitle = document.getElementById('detail-subtitle');
     const portionSlider = document.getElementById('portion-slider');
-    const portionValue = document.getElementById('portion-value');
+    const portionInput = document.getElementById('portion-input');
     const portionUnit = document.getElementById('portion-unit');
     const portionGrams = document.getElementById('portion-grams');
     const confirmBtn = document.getElementById('confirm-btn');
@@ -308,10 +312,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const multiplier = item.portionMultiplier || 1;
         const grams = Math.round(item.selected.grams_per_unit * multiplier);
         
-        portionValue.textContent = multiplier.toFixed(1);
+        portionInput.value = multiplier.toFixed(1);
         portionUnit.textContent = item.selected.unit;
         portionGrams.textContent = `~${grams} grams`;
-        portionSlider.value = multiplier;
+        portionSlider.value = Math.min(multiplier, 4);
         
         sizeButtons.forEach(btn => {
             const size = parseFloat(btn.dataset.size);
@@ -359,6 +363,43 @@ document.addEventListener('DOMContentLoaded', function() {
         const item = items[currentItemIndex];
         item.portionMultiplier = parseFloat(this.value);
         updatePortionDisplay();
+    });
+    
+    portionInput.addEventListener('input', function() {
+        const item = items[currentItemIndex];
+        if (!item || !item.selected) return;
+        
+        let value = parseFloat(this.value);
+        if (isNaN(value) || value < 0.1) value = 0.1;
+        if (value > 10) value = 10;
+        
+        item.portionMultiplier = value;
+        
+        const grams = Math.round(item.selected.grams_per_unit * value);
+        portionGrams.textContent = `~${grams} grams`;
+        portionSlider.value = Math.min(value, 4);
+        
+        sizeButtons.forEach(btn => {
+            const size = parseFloat(btn.dataset.size);
+            if (Math.abs(size - value) < 0.1) {
+                btn.classList.remove('bg-[#2c2348]', 'text-white/60');
+                btn.classList.add('bg-primary', 'text-white');
+            } else {
+                btn.classList.remove('bg-primary', 'text-white');
+                btn.classList.add('bg-[#2c2348]', 'text-white/60');
+            }
+        });
+    });
+    
+    portionInput.addEventListener('blur', function() {
+        const item = items[currentItemIndex];
+        if (!item || !item.selected) return;
+        
+        let value = parseFloat(this.value);
+        if (isNaN(value) || value < 0.1) value = 0.1;
+        if (value > 10) value = 10;
+        this.value = value.toFixed(1);
+        item.portionMultiplier = value;
     });
     
     sizeButtons.forEach(btn => {
