@@ -58,6 +58,14 @@ JWT_EXPIRY_HOURS = 24
 # Daily meal limit per user
 DAILY_MEAL_LIMIT = 4
 
+# Per-minute rate limiting configuration
+REQUESTS_PER_MINUTE = 10
+request_timestamps = {}  # {user_id: [timestamp1, timestamp2, ...]}
+
+# AI response cache for nutrition estimates (reduces OpenAI API costs)
+ai_nutrition_cache = {}  # {food_name_lower: {data: {...}, cached_at: datetime}}
+AI_CACHE_EXPIRY_HOURS = 24  # Cache AI responses for 24 hours
+
 # Global variable to store food database
 food_database = []
 food_lookup = {}
@@ -190,8 +198,35 @@ def check_daily_limit(user_id, endpoint):
     return True, today_count + 1
 
 
+def check_per_minute_limit(user_id):
+    """Check if user has exceeded per-minute rate limit (in-memory)"""
+    global request_timestamps
+    
+    now = datetime.utcnow()
+    one_minute_ago = now - timedelta(minutes=1)
+    
+    # Get user's recent request timestamps
+    if user_id not in request_timestamps:
+        request_timestamps[user_id] = []
+    
+    # Clean up old timestamps (older than 1 minute)
+    request_timestamps[user_id] = [
+        ts for ts in request_timestamps[user_id] 
+        if ts > one_minute_ago
+    ]
+    
+    # Check if user has exceeded limit
+    if len(request_timestamps[user_id]) >= REQUESTS_PER_MINUTE:
+        return False, len(request_timestamps[user_id])
+    
+    # Record this request
+    request_timestamps[user_id].append(now)
+    
+    return True, len(request_timestamps[user_id])
+
+
 def require_auth_with_limit(f):
-    """Decorator that requires auth AND enforces daily meal limit"""
+    """Decorator that requires auth AND enforces daily meal limit + per-minute limit"""
     @wraps(f)
     def decorated(*args, **kwargs):
         auth_header = request.headers.get('Authorization')
@@ -224,6 +259,16 @@ def require_auth_with_limit(f):
                 'error': 'User not found',
                 'message': 'The user associated with this token no longer exists'
             }), 401
+        
+        # Check per-minute rate limit first (prevents burst abuse)
+        minute_allowed, minute_count = check_per_minute_limit(user_id)
+        if not minute_allowed:
+            return jsonify({
+                'error': 'Rate limit exceeded',
+                'message': f'Too many requests. Maximum {REQUESTS_PER_MINUTE} requests per minute. Please wait a moment.',
+                'requests_per_minute': REQUESTS_PER_MINUTE,
+                'current_count': minute_count
+            }), 429
         
         # Check daily limit
         allowed, count = check_daily_limit(user_id, request.endpoint)
@@ -444,11 +489,31 @@ def load_food_database():
 
 
 def get_nutrition_from_ai(food_name):
-    """Get nutrition information from OpenAI for unknown food items"""
+    """Get nutrition information from OpenAI for unknown food items (with caching)"""
+    global ai_nutrition_cache
+    
+    food_name_lower = food_name.lower().strip()
+    
+    # Check cache first
+    if food_name_lower in ai_nutrition_cache:
+        cached_entry = ai_nutrition_cache[food_name_lower]
+        cache_age = datetime.utcnow() - cached_entry['cached_at']
+        
+        # Return cached data if not expired
+        if cache_age < timedelta(hours=AI_CACHE_EXPIRY_HOURS):
+            app.logger.info(f"Cache HIT for '{food_name}' (age: {cache_age.seconds // 60} minutes)")
+            return cached_entry['data']
+        else:
+            # Remove expired entry
+            del ai_nutrition_cache[food_name_lower]
+            app.logger.info(f"Cache EXPIRED for '{food_name}', fetching fresh data")
+    
     try:
         if not openai_client:
             app.logger.error("OpenAI client not available for nutrition lookup")
             return None
+        
+        app.logger.info(f"Cache MISS for '{food_name}', calling OpenAI API")
         
         system_prompt = """Give glycemic index (GI), carbs per unit (in grams), fiber per unit (in grams), unit, and unit_desc for one serving of the specified food item.
 Return only in JSON with keys: gi, carbs_per_unit, fiber_per_unit, unit, unit_desc.
@@ -492,7 +557,13 @@ Example for 'Kheer':
             app.logger.error(f"Invalid nutrition data types from AI: {nutrition_data}")
             return None
         
-        app.logger.info(f"Successfully retrieved AI nutrition data for {food_name}")
+        # Cache the successful response
+        ai_nutrition_cache[food_name_lower] = {
+            'data': nutrition_data,
+            'cached_at': datetime.utcnow()
+        }
+        app.logger.info(f"Cached AI nutrition data for '{food_name}' (cache size: {len(ai_nutrition_cache)})")
+        
         return nutrition_data
         
     except json.JSONDecodeError as e:
