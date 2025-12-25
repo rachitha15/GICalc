@@ -53,6 +53,14 @@
                 <div id="success-message" class="hidden bg-green-500/10 border border-green-500/30 text-green-400 px-4 py-3 rounded-xl text-sm"></div>
 
                 <form id="register-form" class="flex flex-col gap-4">
+                    <!-- Anti-bot: Honeypot field (hidden from users, bots fill it) -->
+                    <div style="position: absolute; left: -9999px; top: -9999px;" aria-hidden="true">
+                        <label for="website">Leave this empty</label>
+                        <input type="text" id="website" name="website" tabindex="-1" autocomplete="off" />
+                    </div>
+                    <!-- Anti-bot: Form load timestamp -->
+                    <input type="hidden" id="form-timestamp" name="_t" />
+                    
                     <label class="flex flex-col gap-2 group/input">
                         <span class="text-gray-900 dark:text-white text-sm font-medium ml-1">Email Address</span>
                         <div class="relative">
@@ -115,11 +123,18 @@
 
 {% block scripts %}
 <script>
+// Set form load timestamp on page load (for anti-bot timing check)
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('form-timestamp').value = Date.now().toString();
+});
+
 document.getElementById('register-form').addEventListener('submit', async function(e) {
     e.preventDefault();
     
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
+    const website = document.getElementById('website').value; // Honeypot
+    const formTimestamp = document.getElementById('form-timestamp').value;
     
     const errorDiv = document.getElementById('error-message');
     const successDiv = document.getElementById('success-message');
@@ -148,7 +163,7 @@ document.getElementById('register-form').addEventListener('submit', async functi
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ email, password })
+            body: JSON.stringify({ email, password, website, _t: formTimestamp })
         });
         
         const data = await response.json();

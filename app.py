@@ -66,6 +66,44 @@ request_timestamps = {}  # {user_id: [timestamp1, timestamp2, ...]}
 ai_nutrition_cache = {}  # {food_name_lower: {data: {...}, cached_at: datetime}}
 AI_CACHE_EXPIRY_HOURS = 24  # Cache AI responses for 24 hours
 
+# Anti-bot: IP-based registration limits
+IP_REGISTRATIONS_PER_DAY = 3
+ip_registration_tracker = {}  # {ip: [datetime1, datetime2, ...]}
+
+# Anti-bot: Minimum registration time (seconds) - reject if form submitted too fast
+MIN_REGISTRATION_TIME_SECONDS = 3
+
+# Anti-bot: Disposable email domains blocklist (common temporary email services)
+DISPOSABLE_EMAIL_DOMAINS = {
+    'mailinator.com', 'tempmail.com', 'throwaway.email', 'guerrillamail.com',
+    'guerrillamail.net', 'guerrillamail.org', 'sharklasers.com', 'grr.la',
+    'guerrillamailblock.com', 'pokemail.net', 'spam4.me', '10minutemail.com',
+    '10minutemail.net', 'tempinbox.com', 'fakeinbox.com', 'trashmail.com',
+    'trashmail.net', 'mailnesia.com', 'maildrop.cc', 'getnada.com',
+    'yopmail.com', 'yopmail.fr', 'yopmail.net', 'temp-mail.org', 'temp-mail.io',
+    'disposablemail.com', 'throwawaymail.com', 'mintemail.com', 'mohmal.com',
+    'discard.email', 'discardmail.com', 'mailcatch.com', 'tempr.email',
+    'tempail.com', 'fakemailgenerator.com', 'emailondeck.com', 'jetable.org',
+    'mytrashmail.com', 'mt2009.com', 'thankyou2010.com', 'trash2009.com',
+    'mailforspam.com', 'spamgourmet.com', 'getairmail.com', 'mailnull.com',
+    'e4ward.com', 'spamex.com', 'spamfree24.org', 'antispam.de', 'spamhole.com',
+    'kasmail.com', 'spamcowboy.com', 'spammotel.com', 'spaml.com', 'uggsrock.com',
+    'tempsky.com', 'tempomail.fr', 'temporaryemail.net', 'temporaryforwarding.com',
+    'temporaryinbox.com', 'thanksnospam.info', 'thisisnotmyrealemail.com',
+    'throam.com', 'tittbit.in', 'tmail.ws', 'tmailinator.com', 'toiea.com',
+    'trbvm.com', 'trickmail.net', 'trillianpro.com', 'turual.com',
+    'twinmail.de', 'tyldd.com', 'uggsrock.com', 'upliftnow.com', 'uplipht.com',
+    'venompen.com', 'veryrealemail.com', 'viditag.com', 'viewcastmedia.com',
+    'viewcastmedia.net', 'viewcastmedia.org', 'webm4il.info', 'wegwerfmail.de',
+    'wegwerfmail.net', 'wegwerfmail.org', 'wetrainbayarea.com', 'wetrainbayarea.org',
+    'wh4f.org', 'whopy.com', 'wilemail.com', 'willselfdestruct.com', 'winemaven.info',
+    'wronghead.com', 'wuzup.net', 'wuzupmail.net', 'wwwnew.eu', 'xagloo.com',
+    'xemaps.com', 'xents.com', 'xmaily.com', 'xoxy.net', 'yapped.net',
+    'yeah.net', 'yep.it', 'yogamaven.com', 'yuurok.com', 'zehnminutenmail.de',
+    'zippymail.info', 'zoaxe.com', 'zoemail.org', 'mailsac.com', 'mailsac.net',
+    'safetymail.info', 'safetypost.de', 'sandelf.de', 'saynotospams.com'
+}
+
 # Global variable to store food database
 food_database = []
 food_lookup = {}
@@ -198,6 +236,48 @@ def check_daily_limit(user_id, endpoint):
     return True, today_count + 1
 
 
+def is_disposable_email(email):
+    """Check if email domain is in the disposable email blocklist"""
+    try:
+        domain = email.split('@')[1].lower()
+        return domain in DISPOSABLE_EMAIL_DOMAINS
+    except (IndexError, AttributeError):
+        return False
+
+
+def check_ip_registration_limit(ip_address):
+    """Check if IP has exceeded daily registration limit"""
+    global ip_registration_tracker
+    
+    now = datetime.utcnow()
+    one_day_ago = now - timedelta(days=1)
+    
+    if ip_address not in ip_registration_tracker:
+        ip_registration_tracker[ip_address] = []
+    
+    # Clean up old timestamps
+    ip_registration_tracker[ip_address] = [
+        ts for ts in ip_registration_tracker[ip_address]
+        if ts > one_day_ago
+    ]
+    
+    # Check if limit exceeded
+    if len(ip_registration_tracker[ip_address]) >= IP_REGISTRATIONS_PER_DAY:
+        return False, len(ip_registration_tracker[ip_address])
+    
+    return True, len(ip_registration_tracker[ip_address])
+
+
+def record_ip_registration(ip_address):
+    """Record a successful registration for an IP"""
+    global ip_registration_tracker
+    
+    if ip_address not in ip_registration_tracker:
+        ip_registration_tracker[ip_address] = []
+    
+    ip_registration_tracker[ip_address].append(datetime.utcnow())
+
+
 def check_per_minute_limit(user_id):
     """Check if user has exceeded per-minute rate limit (in-memory)"""
     global request_timestamps
@@ -293,7 +373,7 @@ def require_auth_with_limit(f):
 
 @app.route('/auth/register', methods=['POST'])
 def register():
-    """Register a new user"""
+    """Register a new user (with anti-bot protections)"""
     try:
         if not request.is_json:
             return jsonify({
@@ -301,7 +381,56 @@ def register():
                 'message': 'Content-Type must be application/json'
             }), 400
         
+        # Get client IP for rate limiting
+        client_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+        if client_ip and ',' in client_ip:
+            client_ip = client_ip.split(',')[0].strip()
+        
+        # Anti-bot: Check IP registration limit
+        ip_allowed, ip_count = check_ip_registration_limit(client_ip)
+        if not ip_allowed:
+            app.logger.warning(f"IP registration limit exceeded for {client_ip}")
+            return jsonify({
+                'error': 'Registration limit reached',
+                'message': 'Too many accounts created from this location. Please try again later.'
+            }), 429
+        
         data = request.get_json()
+        
+        # Anti-bot: Check honeypot field (should be empty - bots fill it)
+        honeypot = data.get('website', '')
+        if honeypot:
+            app.logger.warning(f"Honeypot triggered from IP {client_ip}")
+            return jsonify({
+                'error': 'Registration failed',
+                'message': 'An unexpected error occurred'
+            }), 400
+        
+        # Anti-bot: Check timing (reject if submitted too fast or missing timestamp)
+        form_load_time = data.get('_t')
+        if not form_load_time:
+            # Missing timestamp - likely a bot bypassing the form
+            app.logger.warning(f"Missing form timestamp from IP {client_ip}")
+            return jsonify({
+                'error': 'Registration failed',
+                'message': 'Please use the registration form'
+            }), 400
+        
+        try:
+            load_timestamp = float(form_load_time)
+            elapsed_seconds = (datetime.utcnow().timestamp() * 1000 - load_timestamp) / 1000
+            if elapsed_seconds < MIN_REGISTRATION_TIME_SECONDS:
+                app.logger.warning(f"Form submitted too fast ({elapsed_seconds:.1f}s) from IP {client_ip}")
+                return jsonify({
+                    'error': 'Registration failed',
+                    'message': 'Please take your time filling out the form'
+                }), 400
+        except (ValueError, TypeError):
+            app.logger.warning(f"Invalid form timestamp from IP {client_ip}")
+            return jsonify({
+                'error': 'Registration failed',
+                'message': 'Please use the registration form'
+            }), 400
         
         email = data.get('email', '').strip().lower()
         password = data.get('password', '')
@@ -320,6 +449,14 @@ def register():
             return jsonify({
                 'error': 'Invalid email',
                 'message': str(e)
+            }), 400
+        
+        # Anti-bot: Block disposable email domains
+        if is_disposable_email(email):
+            app.logger.warning(f"Disposable email rejected: {email} from IP {client_ip}")
+            return jsonify({
+                'error': 'Invalid email',
+                'message': 'Temporary or disposable email addresses are not allowed. Please use a permanent email.'
             }), 400
         
         # Validate password
@@ -343,8 +480,13 @@ def register():
         db.session.add(user)
         db.session.commit()
         
+        # Record successful registration for IP tracking
+        record_ip_registration(client_ip)
+        
         # Generate token
         token = generate_token(user.id)
+        
+        app.logger.info(f"New user registered: {email} from IP {client_ip}")
         
         return jsonify({
             'status': 'success',
