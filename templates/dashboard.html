@@ -263,9 +263,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (response.ok) {
                 localStorage.setItem('parsedMeal', JSON.stringify(data));
                 localStorage.setItem('originalMealText', mealText);
-                mealsRemaining = Math.max(0, mealsRemaining - 1);
-                remainingCount.textContent = mealsRemaining;
-                updateBatteryDisplay(mealsRemaining);
+                window.location.href = '/review';
             } else if (response.status === 429) {
                 errorDiv.textContent = data.message || 'Daily limit reached. Please try again tomorrow.';
                 errorDiv.classList.remove('hidden');

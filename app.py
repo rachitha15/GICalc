@@ -856,6 +856,59 @@ Important: Always return a JSON object with a "meal" key containing an array of 
         }), 500
 
 
+def extract_grams_from_unit_desc(unit_desc):
+    """Extract grams from unit description like '25g', '150g cooked', 'Medium Size'"""
+    import re
+    match = re.search(r'(\d+)\s*g', unit_desc.lower())
+    if match:
+        return int(match.group(1))
+    size_defaults = {
+        'small': 100,
+        'medium': 150,
+        'large': 200,
+    }
+    for size, grams in size_defaults.items():
+        if size in unit_desc.lower():
+            return grams
+    return 100
+
+
+def get_ai_food_estimation(food_name):
+    """Get AI estimation for unknown food with nutrition and portion info"""
+    if not openai_client:
+        return None
+    
+    try:
+        prompt = f"""For the Indian food item "{food_name}", provide nutrition estimation in JSON format:
+{{
+    "name": "proper food name",
+    "gi": estimated glycemic index (number 0-100),
+    "unit": "typical serving unit like bowl, piece, cup",
+    "unit_desc": "description with grams, e.g. 1 medium bowl = 150g",
+    "grams_per_unit": estimated grams per serving (number),
+    "carbs_per_unit": carbs in grams per serving (number),
+    "fiber_per_unit": fiber in grams per serving (number)
+}}
+Use typical Indian portion sizes. Be conservative with estimates."""
+        
+        response = openai_client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": "You are a nutrition expert specializing in Indian cuisine. Return only valid JSON."},
+                {"role": "user", "content": prompt}
+            ],
+            response_format={"type": "json_object"},
+            max_tokens=200,
+            temperature=0.3
+        )
+        
+        result = json.loads(response.choices[0].message.content)
+        return result
+    except Exception as e:
+        app.logger.error(f"AI estimation failed for {food_name}: {e}")
+        return None
+
+
 @app.route('/parse-meal-smart', methods=['POST'])
 @require_auth_with_limit
 def parse_meal_smart():
@@ -895,6 +948,7 @@ Extract food items and their quantities from the input text.
 Use common food names without specific mapping - just extract what the user mentioned.
 
 Return JSON with "meal" key containing array of objects with "food" and "quantity" keys.
+The quantity should be a number (default to 1 if not specified).
 
 Important: Always return a JSON object with a "meal" key containing an array of food items."""
         
@@ -934,45 +988,95 @@ Important: Always return a JSON object with a "meal" key containing an array of 
         result_items = []
         
         for item in meal_array:
-            food_name = item['food'].lower()
-            quantity = item['quantity']
+            food_name = item.get('food', '').lower()
+            quantity = item.get('quantity', 1)
             
-            matches = []
+            if not food_name:
+                continue
+            
+            db_matches = []
+            exact_match = None
+            
             for db_food in food_database:
                 db_name_lower = db_food['name'].lower()
-                if food_name in db_name_lower or any(word in db_name_lower for word in food_name.split()):
-                    matches.append({
+                
+                if food_name == db_name_lower or food_name in db_name_lower:
+                    grams = extract_grams_from_unit_desc(db_food['unit_desc'])
+                    match_data = {
                         'name': db_food['name'],
                         'category': db_food['category'],
-                        'unit_desc': db_food['unit_desc']
+                        'gi': db_food['gi'],
+                        'unit': db_food['unit'],
+                        'unit_desc': db_food['unit_desc'],
+                        'grams_per_unit': grams,
+                        'carbs_per_unit': db_food['carbs_per_unit'],
+                        'fiber_per_unit': db_food['fiber_per_unit'],
+                        'source': 'database'
+                    }
+                    
+                    if food_name == db_name_lower:
+                        exact_match = match_data
+                    db_matches.append(match_data)
+                elif any(word in db_name_lower for word in food_name.split() if len(word) > 2):
+                    grams = extract_grams_from_unit_desc(db_food['unit_desc'])
+                    db_matches.append({
+                        'name': db_food['name'],
+                        'category': db_food['category'],
+                        'gi': db_food['gi'],
+                        'unit': db_food['unit'],
+                        'unit_desc': db_food['unit_desc'],
+                        'grams_per_unit': grams,
+                        'carbs_per_unit': db_food['carbs_per_unit'],
+                        'fiber_per_unit': db_food['fiber_per_unit'],
+                        'source': 'database'
                     })
             
-            if len(matches) == 0:
-                result_items.append({
-                    'original_name': item['food'],
-                    'quantity': quantity,
-                    'status': 'needs_ai',
-                    'matches': []
-                })
-            elif len(matches) == 1:
-                result_items.append({
-                    'original_name': item['food'],
-                    'quantity': quantity,
-                    'status': 'single_match',
-                    'selected_food': matches[0]['name'],
-                    'matches': matches
-                })
+            ai_option = None
+            if len(db_matches) == 0:
+                ai_data = get_ai_food_estimation(item['food'])
+                if ai_data:
+                    ai_option = {
+                        'name': ai_data.get('name', item['food']),
+                        'gi': ai_data.get('gi', 50),
+                        'unit': ai_data.get('unit', 'serving'),
+                        'unit_desc': ai_data.get('unit_desc', '1 serving = 150g'),
+                        'grams_per_unit': ai_data.get('grams_per_unit', 150),
+                        'carbs_per_unit': ai_data.get('carbs_per_unit', 30),
+                        'fiber_per_unit': ai_data.get('fiber_per_unit', 2),
+                        'source': 'ai_estimated'
+                    }
+            
+            if exact_match:
+                match_type = 'exact_match'
+                selected = exact_match
+            elif len(db_matches) == 1:
+                match_type = 'exact_match'
+                selected = db_matches[0]
+            elif len(db_matches) > 1:
+                match_type = 'multiple_options'
+                selected = None
+            elif ai_option:
+                match_type = 'ai_estimated'
+                selected = ai_option
             else:
-                result_items.append({
-                    'original_name': item['food'],
-                    'quantity': quantity,
-                    'status': 'needs_disambiguation',
-                    'matches': matches
-                })
+                match_type = 'unknown'
+                selected = None
+            
+            result_items.append({
+                'id': len(result_items),
+                'original_name': item['food'],
+                'quantity': quantity,
+                'match_type': match_type,
+                'db_options': db_matches[:5],
+                'ai_option': ai_option,
+                'selected': selected,
+                'confirmed': match_type == 'exact_match'
+            })
         
         return jsonify({
             'status': 'success',
             'items': result_items,
+            'total_items': len(result_items),
             'usage': {
                 'used_today': request.usage_count,
                 'daily_limit': DAILY_MEAL_LIMIT,
@@ -1085,6 +1189,12 @@ def login_page():
 def dashboard_page():
     """Dashboard page (placeholder for now)"""
     return render_template('dashboard.html')
+
+
+@app.route('/review')
+def review_page():
+    """Disambiguation/Review meal page"""
+    return render_template('review.html')
 
 
 # ============================================

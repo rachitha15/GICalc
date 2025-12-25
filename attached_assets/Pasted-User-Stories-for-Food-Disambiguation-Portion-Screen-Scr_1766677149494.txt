@@ -1,0 +1,40 @@
+User Stories for Food Disambiguation & Portion Screen
+Screen Context: This screen displays a list of food items detected from the user's natural language meal input. For each item, the user must confirm its identity and portion size before proceeding to Glycemic Load calculation.
+
+Core User Flow: Confirming All Meal Items
+
+As a user, I want to clearly see a list of all food items detected from my meal input, so I can understand what needs to be confirmed.
+As a user, I want to easily navigate through each food item in the list, so I can confirm its details one by one.
+As a user, I want to see a visual indication of which food items have been confirmed and which still require action, so I can track my progress.
+As a user, when all food items in my meal have been confirmed, I want the primary call-to-action button to change from "Confirm & Next" to "Calculate Glycemic Load", so I can proceed to the final analysis.
+As a user, I want to be able to go "Back to Meal Input" at any point, so I can adjust my original meal entry if needed.
+Scenario 1: Exact Match (from Database)
+
+As a user, when a food item is an "Exact Match" from the database, I want it to be pre-selected and marked as confirmed, so I don't have to take extra steps for known foods.
+As a user, for an "Exact Match," I want to see the recognized food name and its default portion size, so I know what the system has identified.
+As a user, even for an "Exact Match," I want to be able to adjust the portion size, so I can accurately reflect my consumption (e.g., "0.5 bowl," "2 bowls").
+As a user, if I adjust the portion for an "Exact Match," the system should recalculate and display the updated quantity in grams/standard units, so I have clear data.
+Scenario 2: Multiple Options (from Database - Requires User Selection)
+
+As a user, when a food item has "Multiple Options" (similar matches in the database), I want to see a list of these options with clear identifiers (e.g., "DB Match"), so I can choose the correct one.
+As a user, I want to be able to select one of the provided options, so the system accurately identifies my food.
+As a user, after selecting an option, I want to be able to adjust its portion size, so it reflects my actual intake.
+As a user, I want to see helpful portion descriptions (e.g., "1 medium dosa = 30g") for each selected option, so I can choose the most accurate quantity.
+As a user, if none of the database options are correct, I want an "None of these - Use AI to estimate" option, so I can still get an analysis for my specific food.
+Scenario 3: Unknown Food (Not in Database - Requires AI Estimation Confirmation)
+
+As a user, when a food item is an "Unknown Food" (not in the database), I want to be informed that AI estimation will be used, so I understand the data source.
+As a user, I want to see the AI-estimated food name and an initial estimated portion size, so I have a starting point for confirmation.
+As a user, I want to be able to confirm the AI-estimated food name (e.g., "Is 'Curry' actually 'Mixed Vegetable Curry'?"), so I can ensure accuracy.
+As a user, I want to be able to adjust the portion size for the AI-estimated food, so I can make it as precise as possible.
+As a user, I want helpful, AI-generated portion descriptions when possible, to assist with accurate portion selection for unknown foods.
+Edge Cases & Error Handling:
+
+As a user, if I make a mistake in selecting a food or portion, I want to be able to go back and re-select/re-adjust that specific item, so I can correct my input.
+As a user, if the system fails to detect any food items from my natural language input, I want a clear message indicating this, and an option to either re-enter my meal or "Add missing item" manually.
+As a user, if I manually add a missing item, I want the system to process it like any other detected item (checking DB, offering options, or using AI), so it fits seamlessly into the workflow.
+As a user, if there's a delay in AI estimation for an "Unknown Food," I want to see a loading indicator, so I know the system is actively working.
+As a user, if AI estimation fails for an "Unknown Food" (e.g., unable to identify even with AI), I want a clear message and options to either input manually or skip for now, so I'm not stuck.
+As a user, if I try to click "Calculate Glycemic Load" before all items are confirmed, I want a gentle reminder or visual cue indicating which items still require action, so I know what's pending.
+As a user, I want to see visual indicators (e.g., a small icon or text label) next to each food item clarifying if it's a "DB Match" or "AI Estimated", for transparency and user trust.
+As a user, if a database match has significantly different nutritional profiles for similar names (e.g., "rice" vs "rice flour"), the disambiguation process should prioritize presenting distinct options clearly, to avoid user confusion.

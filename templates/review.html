@@ -1,0 +1,481 @@
+{% extends "base.html" %}
+
+{% block title %}Review Meal - Glycemic Guide AI{% endblock %}
+
+{% block header_right %}
+<button id="logout-btn" class="text-gray-600 dark:text-white text-sm font-medium hover:underline">Log Out</button>
+{% endblock %}
+
+{% block content %}
+<style>
+    input[type=range] {
+        -webkit-appearance: none; 
+        background: transparent; 
+    }
+    input[type=range]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        height: 24px;
+        width: 24px;
+        border-radius: 50%;
+        background: #ffffff;
+        cursor: pointer;
+        margin-top: -10px; 
+        box-shadow: 0 0 10px rgba(73, 19, 236, 0.5);
+        transition: transform 0.1s ease;
+    }
+    input[type=range]:active::-webkit-slider-thumb {
+        transform: scale(1.2);
+    }
+    input[type=range]::-webkit-slider-runnable-track {
+        width: 100%;
+        height: 4px;
+        cursor: pointer;
+        background: #2c2348;
+        border-radius: 2px;
+    }
+    input[type=range]:focus::-webkit-slider-runnable-track {
+        background: #4913ec;
+    }
+    .ai-pulse {
+        animation: pulse-glow 3s infinite;
+    }
+    @keyframes pulse-glow {
+        0%, 100% { box-shadow: 0 0 15px rgba(247, 37, 133, 0.2); }
+        50% { box-shadow: 0 0 25px rgba(247, 37, 133, 0.5); }
+    }
+</style>
+
+<div class="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
+    <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-primary/20 blur-[120px]"></div>
+    <div class="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] rounded-full bg-primary/10 blur-[100px]"></div>
+</div>
+
+<div class="flex flex-col w-full max-w-7xl mx-auto gap-6">
+    <div class="flex items-center gap-2 text-white/50 text-sm font-medium pt-2">
+        <a href="/dashboard" class="hover:text-white flex items-center gap-1 transition-colors group">
+            <span class="material-symbols-outlined text-base group-hover:-translate-x-1 transition-transform">arrow_back</span>
+            Back to Meal Input
+        </a>
+    </div>
+
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-3xl md:text-4xl font-bold text-white tracking-tight">Review Meal</h1>
+            <p id="subtitle" class="text-white/60 text-lg">Confirm details for <span id="item-count">0</span> detected items</p>
+        </div>
+        <div class="hidden md:flex items-center gap-2 px-4 py-2 bg-[#201933] rounded-full border border-white/5">
+            <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+            <span class="text-sm font-bold text-white/80">AI Analysis Active</span>
+        </div>
+    </div>
+
+    <div id="error-message" class="hidden bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-xl text-sm"></div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <section class="lg:col-span-4 flex flex-col gap-4">
+            <div id="food-list" class="bg-[#1a1429]/50 backdrop-blur-sm rounded-3xl p-1 border border-white/5">
+            </div>
+        </section>
+
+        <section class="lg:col-span-8 flex flex-col gap-6">
+            <div id="detail-panel" class="bg-[#1a1429]/50 backdrop-blur-md rounded-[2.5rem] p-6 md:p-8 border border-white/5 relative shadow-2xl">
+                <div class="flex items-start justify-between mb-6 md:mb-8 border-b border-white/5 pb-6">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white mb-1">Identify & Measure</h2>
+                        <p id="detail-subtitle" class="text-white/50">Select a food item from the left to configure.</p>
+                    </div>
+                </div>
+
+                <div id="selection-area" class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div id="type-selection" class="flex flex-col gap-4">
+                        <h3 class="text-sm font-bold text-white/70 uppercase tracking-wider mb-2">Select Type</h3>
+                        <div id="options-container" class="flex flex-col gap-3">
+                            <p class="text-white/40 text-sm">No food selected</p>
+                        </div>
+                    </div>
+
+                    <div id="portion-section" class="flex flex-col gap-4">
+                        <h3 class="text-sm font-bold text-white/70 uppercase tracking-wider mb-2">Adjust Portion</h3>
+                        <div class="bg-[#201933]/70 backdrop-blur-md rounded-2xl p-6 flex flex-col gap-6 border border-white/5">
+                            <div class="text-center">
+                                <span id="portion-value" class="text-4xl font-bold text-white">1.0</span>
+                                <span id="portion-unit" class="text-xl text-white/60 ml-2">serving</span>
+                                <p id="portion-grams" class="text-green-400 text-sm mt-1">~150 grams</p>
+                            </div>
+
+                            <input type="range" id="portion-slider" min="0.5" max="2" step="0.1" value="1" class="w-full">
+
+                            <div class="flex justify-center gap-2">
+                                <button data-size="0.5" class="size-btn px-4 py-2 rounded-lg bg-[#2c2348] text-white/60 text-sm font-medium hover:bg-primary/20 hover:text-white transition-all">Small</button>
+                                <button data-size="1" class="size-btn px-4 py-2 rounded-lg bg-primary text-white text-sm font-medium">Medium</button>
+                                <button data-size="1.5" class="size-btn px-4 py-2 rounded-lg bg-[#2c2348] text-white/60 text-sm font-medium hover:bg-primary/20 hover:text-white transition-all">Large</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button id="confirm-btn" class="relative w-full group overflow-hidden rounded-full p-[2px] focus:outline-none focus:ring-4 focus:ring-primary/30 active:scale-[0.98] transition-transform disabled:opacity-50 disabled:cursor-not-allowed">
+                <span class="absolute inset-0 bg-gradient-to-r from-primary via-[#7c4dff] to-primary opacity-80"></span>
+                <div class="relative flex items-center justify-center gap-2 h-14 w-full rounded-full bg-primary hover:bg-transparent hover:bg-gradient-to-r hover:from-primary hover:to-[#6020f0] transition-all">
+                    <span id="confirm-btn-text" class="text-white text-lg font-bold tracking-wide">Confirm & Next</span>
+                    <span id="confirm-btn-loading" class="hidden">
+                        <svg class="animate-spin h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                    </span>
+                    <span id="confirm-btn-arrow" class="material-symbols-outlined text-white group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                </div>
+            </button>
+        </section>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const token = localStorage.getItem('token');
+    
+    if (!token) {
+        window.location.href = '/login';
+        return;
+    }
+    
+    const parsedMealData = localStorage.getItem('parsedMeal');
+    if (!parsedMealData) {
+        window.location.href = '/dashboard';
+        return;
+    }
+    
+    let mealData;
+    try {
+        mealData = JSON.parse(parsedMealData);
+    } catch (e) {
+        window.location.href = '/dashboard';
+        return;
+    }
+    
+    if (!mealData.items || mealData.items.length === 0) {
+        window.location.href = '/dashboard';
+        return;
+    }
+    
+    const items = mealData.items;
+    let currentItemIndex = 0;
+    
+    document.getElementById('item-count').textContent = items.length;
+    
+    const foodListContainer = document.getElementById('food-list');
+    const optionsContainer = document.getElementById('options-container');
+    const detailSubtitle = document.getElementById('detail-subtitle');
+    const portionSlider = document.getElementById('portion-slider');
+    const portionValue = document.getElementById('portion-value');
+    const portionUnit = document.getElementById('portion-unit');
+    const portionGrams = document.getElementById('portion-grams');
+    const confirmBtn = document.getElementById('confirm-btn');
+    const confirmBtnText = document.getElementById('confirm-btn-text');
+    const confirmBtnLoading = document.getElementById('confirm-btn-loading');
+    const confirmBtnArrow = document.getElementById('confirm-btn-arrow');
+    const sizeButtons = document.querySelectorAll('.size-btn');
+    const errorDiv = document.getElementById('error-message');
+    
+    function renderFoodList() {
+        foodListContainer.innerHTML = '<div class="flex flex-col gap-2">' + items.map((item, index) => {
+            const isActive = index === currentItemIndex;
+            const isConfirmed = item.confirmed;
+            const matchType = item.match_type;
+            
+            let statusText, statusClass, iconName, borderClass;
+            
+            if (isConfirmed) {
+                statusText = 'EXACT MATCH';
+                statusClass = 'text-green-400';
+                iconName = 'database';
+                borderClass = 'border-green-400/20';
+            } else if (matchType === 'multiple_options') {
+                statusText = 'ACTION REQUIRED';
+                statusClass = 'text-primary';
+                iconName = 'restaurant';
+                borderClass = 'border-primary';
+            } else if (matchType === 'ai_estimated') {
+                statusText = 'AI ESTIMATED';
+                statusClass = 'text-pink-400';
+                iconName = 'smart_toy';
+                borderClass = 'border-white/5';
+            } else {
+                statusText = 'UNKNOWN';
+                statusClass = 'text-orange-400';
+                iconName = 'help';
+                borderClass = 'border-orange-400/20';
+            }
+            
+            const activeClass = isActive ? 'bg-primary/10 border-primary shadow-[0_0_20px_rgba(73,19,236,0.15)]' : 'bg-[#201933]/50 hover:bg-[#201933]';
+            
+            const selectedName = item.selected ? item.selected.name : item.original_name;
+            const selectedUnit = item.selected ? item.selected.unit : 'serving';
+            const portionMultiplier = item.portionMultiplier || 1;
+            
+            return `
+                <button onclick="selectItem(${index})" class="flex items-center gap-4 p-4 rounded-2xl ${activeClass} border ${borderClass} relative overflow-hidden group text-left w-full transition-all">
+                    ${isConfirmed ? '<div class="absolute left-0 top-0 bottom-0 w-1 bg-green-400"></div>' : ''}
+                    <div class="h-12 w-12 rounded-xl ${isActive && !isConfirmed ? 'bg-primary animate-pulse' : 'bg-[#1a1429]'} flex items-center justify-center ${statusClass} shrink-0 border border-white/5">
+                        <span class="material-symbols-outlined">${iconName}</span>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <h3 class="text-white font-bold truncate">${selectedName}</h3>
+                        <p class="${statusClass} text-xs font-bold uppercase tracking-wider flex items-center gap-1">
+                            ${isConfirmed ? '<span class="material-symbols-outlined text-[10px]">check_circle</span>' : ''}
+                            ${statusText}
+                        </p>
+                    </div>
+                    ${isConfirmed ? `
+                        <div class="text-right">
+                            <p class="text-white font-medium text-sm">${portionMultiplier.toFixed(1)}</p>
+                            <p class="text-white/40 text-xs">${selectedUnit}</p>
+                        </div>
+                    ` : (isActive ? '<span class="material-symbols-outlined text-primary">arrow_forward_ios</span>' : '')}
+                </button>
+            `;
+        }).join('') + '</div>';
+    }
+    
+    function renderOptions(item) {
+        const options = [];
+        
+        if (item.db_options && item.db_options.length > 0) {
+            item.db_options.forEach((opt, idx) => {
+                const isSelected = item.selected && item.selected.name === opt.name;
+                options.push({
+                    ...opt,
+                    isSelected,
+                    optionIndex: idx,
+                    type: 'db'
+                });
+            });
+        }
+        
+        if (item.ai_option) {
+            const isSelected = item.selected && item.selected.source === 'ai_estimated';
+            options.push({
+                ...item.ai_option,
+                isSelected,
+                optionIndex: 'ai',
+                type: 'ai'
+            });
+        }
+        
+        if (options.length === 0) {
+            optionsContainer.innerHTML = '<p class="text-white/40 text-sm">No options available for this item.</p>';
+            return;
+        }
+        
+        optionsContainer.innerHTML = options.map(opt => {
+            const selectedClass = opt.isSelected 
+                ? 'bg-[#201933] border-primary/50 shadow-xl' 
+                : 'bg-[#1a1429] border-white/5 hover:border-white/20';
+            const badgeClass = opt.type === 'ai' 
+                ? 'bg-pink-400/10 text-pink-400 border-pink-400/20' 
+                : 'bg-green-400/10 text-green-400 border-green-400/20';
+            const badgeText = opt.type === 'ai' ? 'AI ESTIMATED' : 'DB MATCH';
+            
+            return `
+                <div onclick="selectOption(${currentItemIndex}, '${opt.optionIndex}')" class="group cursor-pointer hover:scale-[1.01] transition-transform">
+                    <div class="flex items-center gap-3 rounded-2xl ${selectedClass} p-3 border transition-colors">
+                        <div class="h-14 w-14 rounded-lg ${opt.type === 'ai' ? 'bg-[#201933] border border-white/5 flex items-center justify-center text-pink-400' : 'bg-[#2c2348]'} shrink-0">
+                            ${opt.type === 'ai' ? '<span class="material-symbols-outlined text-2xl">auto_awesome</span>' : ''}
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-white font-bold text-sm">${opt.name}</p>
+                            <div class="flex items-center gap-2 mt-1">
+                                <span class="px-1.5 py-0.5 rounded ${badgeClass} text-[10px] font-bold border">${badgeText}</span>
+                            </div>
+                        </div>
+                        <div class="h-5 w-5 rounded-full ${opt.isSelected ? 'bg-primary flex items-center justify-center' : 'border border-white/20'}">
+                            ${opt.isSelected ? '<span class="material-symbols-outlined text-xs font-bold text-white">check</span>' : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+    
+    function updatePortionDisplay() {
+        const item = items[currentItemIndex];
+        if (!item.selected) return;
+        
+        const multiplier = item.portionMultiplier || 1;
+        const grams = Math.round(item.selected.grams_per_unit * multiplier);
+        
+        portionValue.textContent = multiplier.toFixed(1);
+        portionUnit.textContent = item.selected.unit;
+        portionGrams.textContent = `~${grams} grams`;
+        portionSlider.value = multiplier;
+        
+        sizeButtons.forEach(btn => {
+            const size = parseFloat(btn.dataset.size);
+            if (Math.abs(size - multiplier) < 0.1) {
+                btn.classList.remove('bg-[#2c2348]', 'text-white/60');
+                btn.classList.add('bg-primary', 'text-white');
+            } else {
+                btn.classList.remove('bg-primary', 'text-white');
+                btn.classList.add('bg-[#2c2348]', 'text-white/60');
+            }
+        });
+    }
+    
+    function selectItem(index) {
+        currentItemIndex = index;
+        const item = items[index];
+        
+        detailSubtitle.textContent = `Please clarify the type of "${item.original_name}" and confirm portion.`;
+        
+        renderFoodList();
+        renderOptions(item);
+        updatePortionDisplay();
+        updateConfirmButton();
+    }
+    
+    window.selectOption = function(itemIndex, optionIndex) {
+        const item = items[itemIndex];
+        
+        if (optionIndex === 'ai') {
+            item.selected = item.ai_option;
+        } else {
+            item.selected = item.db_options[parseInt(optionIndex)];
+        }
+        
+        item.portionMultiplier = item.portionMultiplier || 1;
+        
+        renderOptions(item);
+        updatePortionDisplay();
+        updateConfirmButton();
+    };
+    
+    window.selectItem = selectItem;
+    
+    portionSlider.addEventListener('input', function() {
+        const item = items[currentItemIndex];
+        item.portionMultiplier = parseFloat(this.value);
+        updatePortionDisplay();
+    });
+    
+    sizeButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const size = parseFloat(this.dataset.size);
+            const item = items[currentItemIndex];
+            item.portionMultiplier = size;
+            portionSlider.value = size;
+            updatePortionDisplay();
+        });
+    });
+    
+    function updateConfirmButton() {
+        const allConfirmed = items.every(item => item.confirmed);
+        const currentItem = items[currentItemIndex];
+        
+        if (allConfirmed) {
+            confirmBtnText.textContent = 'Calculate Glycemic Load';
+        } else if (currentItem.selected) {
+            confirmBtnText.textContent = 'Confirm & Next';
+        } else {
+            confirmBtnText.textContent = 'Select an option first';
+        }
+        
+        confirmBtn.disabled = !currentItem.selected;
+    }
+    
+    confirmBtn.addEventListener('click', async function() {
+        const item = items[currentItemIndex];
+        
+        if (!item.selected) {
+            errorDiv.textContent = 'Please select a food type first.';
+            errorDiv.classList.remove('hidden');
+            return;
+        }
+        
+        errorDiv.classList.add('hidden');
+        item.confirmed = true;
+        item.portionMultiplier = item.portionMultiplier || 1;
+        
+        const allConfirmed = items.every(i => i.confirmed);
+        
+        if (allConfirmed) {
+            confirmBtn.disabled = true;
+            confirmBtnText.classList.add('hidden');
+            confirmBtnArrow.classList.add('hidden');
+            confirmBtnLoading.classList.remove('hidden');
+            
+            const mealItems = items.map(i => ({
+                food: i.selected.name,
+                quantity: i.quantity * i.portionMultiplier,
+                gi: i.selected.gi,
+                unit: i.selected.unit,
+                grams: Math.round(i.selected.grams_per_unit * i.portionMultiplier),
+                carbs_per_unit: i.selected.carbs_per_unit,
+                fiber_per_unit: i.selected.fiber_per_unit,
+                source: i.selected.source
+            }));
+            
+            try {
+                const response = await fetch('/calculate-gl', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({ meal: mealItems })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    localStorage.setItem('glResult', JSON.stringify(data));
+                    localStorage.removeItem('parsedMeal');
+                } else {
+                    errorDiv.textContent = data.message || 'Failed to calculate glycemic load.';
+                    errorDiv.classList.remove('hidden');
+                }
+            } catch (error) {
+                errorDiv.textContent = 'Network error. Please try again.';
+                errorDiv.classList.remove('hidden');
+            } finally {
+                confirmBtn.disabled = false;
+                confirmBtnText.classList.remove('hidden');
+                confirmBtnArrow.classList.remove('hidden');
+                confirmBtnLoading.classList.add('hidden');
+            }
+        } else {
+            const nextUnconfirmed = items.findIndex((i, idx) => idx > currentItemIndex && !i.confirmed);
+            if (nextUnconfirmed !== -1) {
+                selectItem(nextUnconfirmed);
+            } else {
+                const firstUnconfirmed = items.findIndex(i => !i.confirmed);
+                if (firstUnconfirmed !== -1) {
+                    selectItem(firstUnconfirmed);
+                }
+            }
+        }
+        
+        renderFoodList();
+        updateConfirmButton();
+    });
+    
+    document.getElementById('logout-btn').addEventListener('click', function() {
+        localStorage.clear();
+        window.location.href = '/login';
+    });
+    
+    const firstUnconfirmed = items.findIndex(i => !i.confirmed);
+    if (firstUnconfirmed !== -1) {
+        selectItem(firstUnconfirmed);
+    } else {
+        selectItem(0);
+    }
+    
+    renderFoodList();
+    updateConfirmButton();
+});
+</script>
+{% endblock %}
