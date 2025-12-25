@@ -255,7 +255,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     'Content-Type': 'application/json',
                     'Authorization': 'Bearer ' + token
                 },
-                body: JSON.stringify({ meal_text: mealText })
+                body: JSON.stringify({ text: mealText })
             });
             
             const data = await response.json();
