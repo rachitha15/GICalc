@@ -498,13 +498,36 @@ Each food item in `attached_assets/food_items_db_*.json`:
 
 1. **Password Hashing**: Werkzeug's `generate_password_hash` (default algorithm)
 2. **JWT Tokens**: HS256 algorithm, 24-hour expiry, signed with SESSION_SECRET
-3. **Rate Limiting**: Prevents API abuse (4 calculations/day)
-4. **Input Validation**: 
+3. **Rate Limiting**: Multi-layer protection
+   - **Daily limit**: 4 meal calculations per user per day
+   - **Per-minute limit**: 10 requests per minute per user (prevents burst abuse)
+4. **AI Response Caching**: 24-hour cache for nutrition estimates (reduces OpenAI costs)
+5. **Input Validation**: 
    - Email validation via `email-validator`
    - 500 character limit on meal input
    - JSON schema validation on all endpoints
-5. **CORS**: Enabled for cross-origin requests
-6. **ProxyFix**: Proper HTTPS handling behind reverse proxies
+6. **CORS**: Enabled for cross-origin requests
+7. **ProxyFix**: Proper HTTPS handling behind reverse proxies
+
+### Rate Limit Responses
+
+```json
+// Per-minute limit exceeded (429)
+{
+  "error": "Rate limit exceeded",
+  "message": "Too many requests. Maximum 10 requests per minute. Please wait a moment.",
+  "requests_per_minute": 10,
+  "current_count": 10
+}
+
+// Daily limit exceeded (429)
+{
+  "error": "Daily limit reached",
+  "message": "You have used all 4 meal calculations for today. Please try again tomorrow.",
+  "daily_limit": 4,
+  "used_today": 4
+}
+```
 
 ---
 
