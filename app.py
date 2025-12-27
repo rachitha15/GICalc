@@ -305,6 +305,57 @@ def check_per_minute_limit(user_id):
     return True, len(request_timestamps[user_id])
 
 
+def require_auth_with_minute_limit(f):
+    """Decorator that requires auth AND enforces per-minute limit only (no daily counting)"""
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        auth_header = request.headers.get('Authorization')
+        
+        if not auth_header:
+            return jsonify({
+                'error': 'Authorization required',
+                'message': 'Please provide an Authorization header with Bearer token'
+            }), 401
+        
+        parts = auth_header.split()
+        if len(parts) != 2 or parts[0].lower() != 'bearer':
+            return jsonify({
+                'error': 'Invalid authorization format',
+                'message': 'Authorization header must be: Bearer <token>'
+            }), 401
+        
+        token = parts[1]
+        user_id = decode_token(token)
+        
+        if not user_id:
+            return jsonify({
+                'error': 'Invalid or expired token',
+                'message': 'Please login again to get a new token'
+            }), 401
+        
+        user = db.session.get(User, user_id)
+        if not user:
+            return jsonify({
+                'error': 'User not found',
+                'message': 'The user associated with this token no longer exists'
+            }), 401
+        
+        # Check per-minute rate limit only (prevents burst abuse)
+        minute_allowed, minute_count = check_per_minute_limit(user_id)
+        if not minute_allowed:
+            return jsonify({
+                'error': 'Rate limit exceeded',
+                'message': f'Too many requests. Maximum {REQUESTS_PER_MINUTE} requests per minute. Please wait a moment.',
+                'requests_per_minute': REQUESTS_PER_MINUTE,
+                'current_count': minute_count
+            }), 429
+        
+        request.current_user = user
+        return f(*args, **kwargs)
+    
+    return decorated
+
+
 def require_auth_with_limit(f):
     """Decorator that requires auth AND enforces daily meal limit + per-minute limit"""
     @wraps(f)
@@ -735,8 +786,11 @@ def calculate_glycemic_load(food_item, quantity):
 def get_meal_suggestions(meal_items, total_gl):
     """Get AI-powered meal improvement suggestions"""
     try:
-        if total_gl < 11:
+        if total_gl <= 10:
+            app.logger.info(f"Skipping suggestions: GL {total_gl} is low (threshold > 10)")
             return []
+        
+        app.logger.info(f"Generating suggestions for GL {total_gl} (above threshold of 10)")
             
         if not openai_client:
             app.logger.error("OpenAI client not available for suggestions")
@@ -976,9 +1030,9 @@ def calculate_gl():
 
 
 @app.route('/parse-meal-chat', methods=['POST'])
-@require_auth_with_limit
+@require_auth_with_minute_limit
 def parse_meal_chat():
-    """Parse meal description using OpenAI GPT-4 (PROTECTED - counts toward daily limit)"""
+    """Parse meal description using OpenAI GPT-4 (PROTECTED - per-minute limit only, no daily count)"""
     try:
         if not openai_client:
             return jsonify({
@@ -1132,9 +1186,9 @@ Use typical Indian portion sizes. Be conservative with estimates."""
 
 
 @app.route('/parse-meal-smart', methods=['POST'])
-@require_auth_with_limit
+@require_auth_with_minute_limit
 def parse_meal_smart():
-    """Smart meal parsing with database disambiguation (PROTECTED - counts toward daily limit)"""
+    """Smart meal parsing with database disambiguation (PROTECTED - per-minute limit only, no daily count)"""
     try:
         if not openai_client:
             return jsonify({
