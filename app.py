@@ -215,15 +215,18 @@ def require_auth(f):
     return decorated
 
 
-def check_daily_limit(user_id, endpoint):
-    """Check if user has exceeded daily meal limit and log usage if allowed"""
+def get_daily_usage_count(user_id):
+    """Get user's daily usage count (read-only, no increment)"""
     today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
-    
-    # Count today's usage
-    today_count = MealUsage.query.filter(
+    return MealUsage.query.filter(
         MealUsage.user_id == user_id,
         MealUsage.created_at >= today_start
     ).count()
+
+
+def check_daily_limit(user_id, endpoint):
+    """Check if user has exceeded daily meal limit and log usage if allowed"""
+    today_count = get_daily_usage_count(user_id)
     
     if today_count >= DAILY_MEAL_LIMIT:
         return False, today_count
@@ -350,7 +353,11 @@ def require_auth_with_minute_limit(f):
                 'current_count': minute_count
             }), 429
         
+        # Fetch usage count (read-only) so endpoints can display remaining meals
+        usage_count = get_daily_usage_count(user_id)
+        
         request.current_user = user
+        request.usage_count = usage_count
         return f(*args, **kwargs)
     
     return decorated
