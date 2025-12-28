@@ -1315,7 +1315,7 @@ Important: Always return a JSON object with a "meal" key containing an array of 
                     })
             
             ai_option = None
-            if len(db_matches) == 0:
+            if not exact_match:
                 ai_data = get_ai_food_estimation(item['food'])
                 if ai_data:
                     ai_option = {
@@ -1332,15 +1332,15 @@ Important: Always return a JSON object with a "meal" key containing an array of 
             if exact_match:
                 match_type = 'exact_match'
                 selected = exact_match
+            elif ai_option:
+                match_type = 'multiple_options'
+                selected = None
             elif len(db_matches) == 1:
                 match_type = 'exact_match'
                 selected = db_matches[0]
             elif len(db_matches) > 1:
                 match_type = 'multiple_options'
                 selected = None
-            elif ai_option:
-                match_type = 'ai_estimated'
-                selected = ai_option
             else:
                 match_type = 'unknown'
                 selected = None
