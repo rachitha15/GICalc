@@ -1282,6 +1282,8 @@ Important: Always return a JSON object with a "meal" key containing an array of 
             
             for db_food in food_database:
                 db_name_lower = db_food['name'].lower()
+                food_words = [w for w in food_name.split() if len(w) > 2]
+                db_words = [w for w in db_name_lower.split() if len(w) > 2]
                 
                 if food_name == db_name_lower or food_name in db_name_lower:
                     grams = extract_grams_from_unit_desc(db_food['unit_desc'])
@@ -1300,7 +1302,7 @@ Important: Always return a JSON object with a "meal" key containing an array of 
                     if food_name == db_name_lower:
                         exact_match = match_data
                     db_matches.append(match_data)
-                elif any(word in db_name_lower for word in food_name.split() if len(word) > 2):
+                elif any(word in db_name_lower for word in food_words) or any(db_word in food_name for db_word in db_words):
                     grams = extract_grams_from_unit_desc(db_food['unit_desc'])
                     db_matches.append({
                         'name': db_food['name'],
