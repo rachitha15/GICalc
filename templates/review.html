@@ -36,12 +36,14 @@
     input[type=range]:focus::-webkit-slider-runnable-track {
         background: #4913ec;
     }
-    .ai-pulse {
-        animation: pulse-glow 3s infinite;
+    .accordion-content {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease-out, padding 0.3s ease-out;
     }
-    @keyframes pulse-glow {
-        0%, 100% { box-shadow: 0 0 15px rgba(247, 37, 133, 0.2); }
-        50% { box-shadow: 0 0 25px rgba(247, 37, 133, 0.5); }
+    .accordion-content.expanded {
+        max-height: 1000px;
+        transition: max-height 0.4s ease-in;
     }
 </style>
 
@@ -50,7 +52,7 @@
     <div class="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] rounded-full bg-primary/10 blur-[100px]"></div>
 </div>
 
-<div class="flex flex-col w-full max-w-7xl mx-auto gap-6">
+<div class="flex flex-col w-full max-w-3xl mx-auto gap-6 pb-8">
     <div class="flex items-center gap-2 text-white/50 text-sm font-medium pt-2">
         <a href="/dashboard" class="hover:text-white flex items-center gap-1 transition-colors group">
             <span class="material-symbols-outlined text-base group-hover:-translate-x-1 transition-transform">arrow_back</span>
@@ -71,69 +73,22 @@
 
     <div id="error-message" class="hidden bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-xl text-sm"></div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        <section class="lg:col-span-4 flex flex-col gap-4">
-            <div id="food-list" class="bg-[#1a1429]/50 backdrop-blur-sm rounded-3xl p-1 border border-white/5">
-            </div>
-        </section>
-
-        <section class="lg:col-span-8 flex flex-col gap-6">
-            <div id="detail-panel" class="bg-[#1a1429]/50 backdrop-blur-md rounded-[2.5rem] p-6 md:p-8 border border-white/5 relative shadow-2xl">
-                <div class="flex items-start justify-between mb-6 md:mb-8 border-b border-white/5 pb-6">
-                    <div>
-                        <h2 class="text-2xl font-bold text-white mb-1">Identify & Measure</h2>
-                        <p id="detail-subtitle" class="text-white/50">Select a food item from the left to configure.</p>
-                    </div>
-                </div>
-
-                <div id="selection-area" class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <div id="type-selection" class="flex flex-col gap-4">
-                        <h3 class="text-sm font-bold text-white/70 uppercase tracking-wider mb-2">Select Type</h3>
-                        <div id="options-container" class="flex flex-col gap-3">
-                            <p class="text-white/40 text-sm">No food selected</p>
-                        </div>
-                    </div>
-
-                    <div id="portion-section" class="flex flex-col gap-4">
-                        <h3 class="text-sm font-bold text-white/70 uppercase tracking-wider mb-2">Adjust Portion</h3>
-                        <div class="bg-[#201933]/70 backdrop-blur-md rounded-2xl p-6 flex flex-col gap-6 border border-white/5">
-                            <div class="text-center">
-                                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#2c2348]/50 border border-white/10 hover:border-primary/50 transition-colors cursor-text group" onclick="document.getElementById('portion-input').focus()">
-                                    <input type="number" id="portion-input" min="0.1" max="10" step="0.1" value="1.0" class="w-20 text-4xl font-bold text-white bg-transparent text-center focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
-                                    <span id="portion-unit" class="text-xl text-white/60">serving</span>
-                                    <span class="material-symbols-outlined text-white/40 group-hover:text-primary transition-colors">edit</span>
-                                </div>
-                                <p id="portion-grams" class="text-green-400 text-sm mt-2">~150 grams</p>
-                                <p class="text-white/30 text-xs mt-1">Tap to type custom amount</p>
-                            </div>
-
-                            <input type="range" id="portion-slider" min="0.1" max="4" step="0.1" value="1" class="w-full">
-
-                            <div class="flex justify-center gap-2">
-                                <button data-size="0.5" class="size-btn px-4 py-2 rounded-lg bg-[#2c2348] text-white/60 text-sm font-medium hover:bg-primary/20 hover:text-white transition-all">Small</button>
-                                <button data-size="1" class="size-btn px-4 py-2 rounded-lg bg-primary text-white text-sm font-medium">Medium</button>
-                                <button data-size="1.5" class="size-btn px-4 py-2 rounded-lg bg-[#2c2348] text-white/60 text-sm font-medium hover:bg-primary/20 hover:text-white transition-all">Large</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <button id="confirm-btn" class="relative w-full group overflow-hidden rounded-full p-[2px] focus:outline-none focus:ring-4 focus:ring-primary/30 active:scale-[0.98] transition-transform disabled:opacity-50 disabled:cursor-not-allowed">
-                <span class="absolute inset-0 bg-gradient-to-r from-primary via-[#7c4dff] to-primary opacity-80"></span>
-                <div class="relative flex items-center justify-center gap-2 h-14 w-full rounded-full bg-primary hover:bg-transparent hover:bg-gradient-to-r hover:from-primary hover:to-[#6020f0] transition-all">
-                    <span id="confirm-btn-text" class="text-white text-lg font-bold tracking-wide">Confirm & Next</span>
-                    <span id="confirm-btn-loading" class="hidden">
-                        <svg class="animate-spin h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                    </span>
-                    <span id="confirm-btn-arrow" class="material-symbols-outlined text-white group-hover:translate-x-1 transition-transform">arrow_forward</span>
-                </div>
-            </button>
-        </section>
+    <div id="accordion-container" class="flex flex-col gap-3">
     </div>
+
+    <button id="calculate-btn" class="hidden relative w-full group overflow-hidden rounded-full p-[2px] focus:outline-none focus:ring-4 focus:ring-primary/30 active:scale-[0.98] transition-transform disabled:opacity-50 disabled:cursor-not-allowed mt-4">
+        <span class="absolute inset-0 bg-gradient-to-r from-primary via-[#7c4dff] to-primary opacity-80"></span>
+        <div class="relative flex items-center justify-center gap-2 h-14 w-full rounded-full bg-primary hover:bg-transparent hover:bg-gradient-to-r hover:from-primary hover:to-[#6020f0] transition-all">
+            <span id="calculate-btn-text" class="text-white text-lg font-bold tracking-wide">Calculate Glycemic Load</span>
+            <span id="calculate-btn-loading" class="hidden">
+                <svg class="animate-spin h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+            </span>
+            <span id="calculate-btn-arrow" class="material-symbols-outlined text-white group-hover:translate-x-1 transition-transform">arrow_forward</span>
+        </div>
+    </button>
 </div>
 {% endblock %}
 
@@ -167,221 +122,210 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     const items = mealData.items;
-    let currentItemIndex = 0;
+    let expandedIndex = -1;
     
     document.getElementById('item-count').textContent = items.length;
     
-    const foodListContainer = document.getElementById('food-list');
-    const optionsContainer = document.getElementById('options-container');
-    const detailSubtitle = document.getElementById('detail-subtitle');
-    const portionSlider = document.getElementById('portion-slider');
-    const portionInput = document.getElementById('portion-input');
-    const portionUnit = document.getElementById('portion-unit');
-    const portionGrams = document.getElementById('portion-grams');
-    const confirmBtn = document.getElementById('confirm-btn');
-    const confirmBtnText = document.getElementById('confirm-btn-text');
-    const confirmBtnLoading = document.getElementById('confirm-btn-loading');
-    const confirmBtnArrow = document.getElementById('confirm-btn-arrow');
-    const sizeButtons = document.querySelectorAll('.size-btn');
+    const accordionContainer = document.getElementById('accordion-container');
+    const calculateBtn = document.getElementById('calculate-btn');
+    const calculateBtnText = document.getElementById('calculate-btn-text');
+    const calculateBtnLoading = document.getElementById('calculate-btn-loading');
+    const calculateBtnArrow = document.getElementById('calculate-btn-arrow');
     const errorDiv = document.getElementById('error-message');
     
-    function renderFoodList() {
-        foodListContainer.innerHTML = '<div class="flex flex-col gap-2">' + items.map((item, index) => {
-            const isActive = index === currentItemIndex;
+    function renderAccordion() {
+        accordionContainer.innerHTML = items.map((item, index) => {
+            const isExpanded = index === expandedIndex;
             const isConfirmed = item.confirmed;
             const matchType = item.match_type;
             
             let statusText, statusClass, iconName, borderClass;
             
             if (isConfirmed) {
-                statusText = 'EXACT MATCH';
+                statusText = 'CONFIRMED';
                 statusClass = 'text-green-400';
-                iconName = 'database';
-                borderClass = 'border-green-400/20';
+                iconName = 'check_circle';
+                borderClass = 'border-green-400/30';
             } else if (matchType === 'multiple_options') {
-                statusText = 'ACTION REQUIRED';
+                statusText = 'TAP TO SELECT';
                 statusClass = 'text-primary';
-                iconName = 'restaurant';
-                borderClass = 'border-primary';
+                iconName = 'touch_app';
+                borderClass = 'border-primary/30';
             } else if (matchType === 'ai_estimated') {
-                statusText = 'AI ESTIMATED';
+                statusText = 'TAP TO CONFIRM';
                 statusClass = 'text-pink-400';
                 iconName = 'smart_toy';
-                borderClass = 'border-white/5';
+                borderClass = 'border-pink-400/30';
+            } else if (matchType === 'exact_match') {
+                statusText = 'TAP TO CONFIRM';
+                statusClass = 'text-green-400';
+                iconName = 'database';
+                borderClass = 'border-green-400/30';
             } else {
-                statusText = 'UNKNOWN';
+                statusText = 'TAP TO SELECT';
                 statusClass = 'text-orange-400';
                 iconName = 'help';
-                borderClass = 'border-orange-400/20';
+                borderClass = 'border-orange-400/30';
             }
-            
-            const activeClass = isActive ? 'bg-primary/10 border-primary shadow-[0_0_20px_rgba(73,19,236,0.15)]' : 'bg-[#201933]/50 hover:bg-[#201933]';
             
             const selectedName = item.selected ? item.selected.name : item.original_name;
             const selectedUnit = item.selected ? item.selected.unit : 'serving';
             const portionMultiplier = item.portionMultiplier || 1;
             
+            const headerBg = isExpanded ? 'bg-primary/20' : (isConfirmed ? 'bg-[#1a2e1a]' : 'bg-[#201933]/70');
+            
             return `
-                <button onclick="selectItem(${index})" class="flex items-center gap-4 p-4 rounded-2xl ${activeClass} border ${borderClass} relative overflow-hidden group text-left w-full transition-all">
-                    ${isConfirmed ? '<div class="absolute left-0 top-0 bottom-0 w-1 bg-green-400"></div>' : ''}
-                    <div class="h-12 w-12 rounded-xl ${isActive && !isConfirmed ? 'bg-primary animate-pulse' : 'bg-[#1a1429]'} flex items-center justify-center ${statusClass} shrink-0 border border-white/5">
-                        <span class="material-symbols-outlined">${iconName}</span>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <h3 class="text-white font-bold truncate">${selectedName}</h3>
-                        <p class="${statusClass} text-xs font-bold uppercase tracking-wider flex items-center gap-1">
-                            ${isConfirmed ? '<span class="material-symbols-outlined text-[10px]">check_circle</span>' : ''}
-                            ${statusText}
-                        </p>
-                    </div>
-                    ${isConfirmed ? `
-                        <div class="text-right">
-                            <p class="text-white font-medium text-sm">${portionMultiplier.toFixed(1)}</p>
-                            <p class="text-white/40 text-xs">${selectedUnit}</p>
+                <div class="rounded-2xl border ${isExpanded ? 'border-primary' : borderClass} overflow-hidden transition-all" data-index="${index}">
+                    <div onclick="toggleAccordion(${index})" class="flex items-center gap-4 p-4 ${headerBg} cursor-pointer hover:bg-primary/10 transition-colors">
+                        <div class="h-12 w-12 rounded-xl ${isConfirmed ? 'bg-green-400/20' : 'bg-[#1a1429]'} flex items-center justify-center ${statusClass} shrink-0 border border-white/5">
+                            <span class="material-symbols-outlined">${iconName}</span>
                         </div>
-                    ` : (isActive ? '<span class="material-symbols-outlined text-primary">arrow_forward_ios</span>' : '')}
-                </button>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="text-white font-bold truncate">${selectedName}</h3>
+                            <p class="${statusClass} text-xs font-bold uppercase tracking-wider">${statusText}</p>
+                        </div>
+                        ${isConfirmed ? `
+                            <div class="text-right mr-2">
+                                <p class="text-white font-medium text-sm">${portionMultiplier.toFixed(1)} ${selectedUnit}</p>
+                            </div>
+                        ` : ''}
+                        <span class="material-symbols-outlined text-white/50 transition-transform ${isExpanded ? 'rotate-180' : ''}">expand_more</span>
+                    </div>
+                    
+                    <div class="accordion-content ${isExpanded ? 'expanded' : ''}" id="content-${index}">
+                        <div class="p-4 pt-2 bg-[#1a1429]/50 border-t border-white/5">
+                            <div class="mb-4">
+                                <h4 class="text-sm font-bold text-white/70 uppercase tracking-wider mb-3">Select Type</h4>
+                                <div id="options-${index}" class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                    ${renderOptionsHTML(item, index)}
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <h4 class="text-sm font-bold text-white/70 uppercase tracking-wider mb-3">Adjust Portion</h4>
+                                <div class="bg-[#201933]/70 rounded-xl p-4 border border-white/5">
+                                    <div class="flex items-center justify-between mb-4">
+                                        <div class="flex items-center gap-2">
+                                            <input type="number" id="portion-input-${index}" min="0.1" max="10" step="0.1" value="${portionMultiplier.toFixed(1)}" 
+                                                   onchange="updatePortion(${index}, this.value)"
+                                                   class="w-16 text-2xl font-bold text-white bg-transparent text-center focus:outline-none border-b border-white/20 focus:border-primary [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+                                            <span class="text-white/60" id="unit-${index}">${selectedUnit}</span>
+                                        </div>
+                                        <span id="grams-${index}" class="text-green-400 text-sm">~${Math.round((item.selected?.grams_per_unit || 150) * portionMultiplier)} grams</span>
+                                    </div>
+                                    <input type="range" id="slider-${index}" min="0.1" max="4" step="0.1" value="${Math.min(portionMultiplier, 4)}" 
+                                           oninput="updatePortionFromSlider(${index}, this.value)"
+                                           class="w-full mb-3">
+                                    <div class="flex justify-center gap-2">
+                                        <button onclick="setPortionSize(${index}, 0.5)" class="size-btn-${index} px-4 py-2 rounded-lg ${Math.abs(portionMultiplier - 0.5) < 0.1 ? 'bg-primary text-white' : 'bg-[#2c2348] text-white/60'} text-sm font-medium hover:bg-primary/50 transition-all">Small</button>
+                                        <button onclick="setPortionSize(${index}, 1)" class="size-btn-${index} px-4 py-2 rounded-lg ${Math.abs(portionMultiplier - 1) < 0.1 ? 'bg-primary text-white' : 'bg-[#2c2348] text-white/60'} text-sm font-medium hover:bg-primary/50 transition-all">Medium</button>
+                                        <button onclick="setPortionSize(${index}, 1.5)" class="size-btn-${index} px-4 py-2 rounded-lg ${Math.abs(portionMultiplier - 1.5) < 0.1 ? 'bg-primary text-white' : 'bg-[#2c2348] text-white/60'} text-sm font-medium hover:bg-primary/50 transition-all">Large</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <button onclick="confirmItem(${index})" 
+                                    class="w-full py-3 rounded-xl bg-primary hover:bg-primary/80 text-white font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                    ${!item.selected ? 'disabled' : ''}>
+                                ${item.selected ? 'Confirm & Continue' : 'Select an option first'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
             `;
-        }).join('') + '</div>';
+        }).join('');
+        
+        updateCalculateButton();
     }
     
-    function renderOptions(item) {
+    function renderOptionsHTML(item, itemIndex) {
         const options = [];
         
         if (item.db_options && item.db_options.length > 0) {
             item.db_options.forEach((opt, idx) => {
-                const isSelected = item.selected && item.selected.name === opt.name;
-                options.push({
-                    ...opt,
-                    isSelected,
-                    optionIndex: idx,
-                    type: 'db'
-                });
+                const isSelected = item.selected && item.selected.name === opt.name && item.selected.source !== 'ai_estimated';
+                options.push({ ...opt, isSelected, optionIndex: idx, type: 'db' });
             });
         }
         
         if (item.ai_option) {
             const isSelected = item.selected && item.selected.source === 'ai_estimated';
-            options.push({
-                ...item.ai_option,
-                isSelected,
-                optionIndex: 'ai',
-                type: 'ai'
-            });
+            options.push({ ...item.ai_option, isSelected, optionIndex: 'ai', type: 'ai' });
         }
         
         if (options.length === 0) {
-            optionsContainer.innerHTML = '<p class="text-white/40 text-sm">No options available for this item.</p>';
-            return;
+            return '<p class="text-white/40 text-sm col-span-2">No options available</p>';
         }
         
-        optionsContainer.innerHTML = options.map(opt => {
+        return options.map(opt => {
             const selectedClass = opt.isSelected 
-                ? 'bg-[#201933] border-primary/50 shadow-xl' 
-                : 'bg-[#1a1429] border-white/5 hover:border-white/20';
+                ? 'bg-primary/20 border-primary' 
+                : 'bg-[#1a1429] border-white/10 hover:border-white/30';
             const badgeClass = opt.type === 'ai' 
-                ? 'bg-pink-400/10 text-pink-400 border-pink-400/20' 
-                : 'bg-green-400/10 text-green-400 border-green-400/20';
-            const badgeText = opt.type === 'ai' ? 'AI ESTIMATED' : 'DB MATCH';
+                ? 'bg-pink-400/10 text-pink-400' 
+                : 'bg-green-400/10 text-green-400';
+            const badgeText = opt.type === 'ai' ? 'AI' : 'DB';
             
             return `
-                <div onclick="selectOption(${currentItemIndex}, '${opt.optionIndex}')" class="group cursor-pointer hover:scale-[1.01] transition-transform">
-                    <div class="flex items-center gap-3 rounded-2xl ${selectedClass} p-3 border transition-colors">
-                        <div class="h-14 w-14 rounded-lg ${opt.type === 'ai' ? 'bg-[#201933] border border-white/5 flex items-center justify-center text-pink-400' : 'bg-[#2c2348]'} shrink-0">
-                            ${opt.type === 'ai' ? '<span class="material-symbols-outlined text-2xl">auto_awesome</span>' : ''}
-                        </div>
-                        <div class="flex-1">
-                            <p class="text-white font-bold text-sm">${opt.name}</p>
-                            <div class="flex items-center gap-2 mt-1">
-                                <span class="px-1.5 py-0.5 rounded ${badgeClass} text-[10px] font-bold border">${badgeText}</span>
-                            </div>
-                        </div>
-                        <div class="h-5 w-5 rounded-full ${opt.isSelected ? 'bg-primary flex items-center justify-center' : 'border border-white/20'}">
-                            ${opt.isSelected ? '<span class="material-symbols-outlined text-xs font-bold text-white">check</span>' : ''}
-                        </div>
+                <div onclick="selectOption(${itemIndex}, '${opt.optionIndex}')" 
+                     class="flex items-center gap-3 p-3 rounded-xl ${selectedClass} border cursor-pointer transition-all hover:scale-[1.01]">
+                    <div class="flex-1 min-w-0">
+                        <p class="text-white font-medium text-sm truncate">${opt.name}</p>
+                        <span class="px-1.5 py-0.5 rounded ${badgeClass} text-[10px] font-bold">${badgeText}</span>
+                    </div>
+                    <div class="h-5 w-5 rounded-full ${opt.isSelected ? 'bg-primary flex items-center justify-center' : 'border border-white/30'}">
+                        ${opt.isSelected ? '<span class="material-symbols-outlined text-xs text-white">check</span>' : ''}
                     </div>
                 </div>
             `;
         }).join('');
     }
     
-    function updatePortionDisplay() {
-        const item = items[currentItemIndex];
-        if (!item.selected) return;
-        
-        const multiplier = item.portionMultiplier || 1;
-        const grams = Math.round(item.selected.grams_per_unit * multiplier);
-        
-        portionInput.value = multiplier.toFixed(1);
-        portionUnit.textContent = item.selected.unit;
-        portionGrams.textContent = `~${grams} grams`;
-        portionSlider.value = Math.min(multiplier, 4);
-        
-        sizeButtons.forEach(btn => {
-            const size = parseFloat(btn.dataset.size);
-            if (Math.abs(size - multiplier) < 0.1) {
-                btn.classList.remove('bg-[#2c2348]', 'text-white/60');
-                btn.classList.add('bg-primary', 'text-white');
-            } else {
-                btn.classList.remove('bg-primary', 'text-white');
-                btn.classList.add('bg-[#2c2348]', 'text-white/60');
-            }
-        });
-    }
-    
-    function selectItem(index) {
-        currentItemIndex = index;
-        const item = items[index];
-        
-        detailSubtitle.textContent = `Please clarify the type of "${item.original_name}" and confirm portion.`;
-        
-        renderFoodList();
-        renderOptions(item);
-        updatePortionDisplay();
-        updateConfirmButton();
-    }
+    window.toggleAccordion = function(index) {
+        if (expandedIndex === index) {
+            expandedIndex = -1;
+        } else {
+            expandedIndex = index;
+        }
+        renderAccordion();
+    };
     
     window.selectOption = function(itemIndex, optionIndex) {
         const item = items[itemIndex];
         
         if (optionIndex === 'ai') {
-            item.selected = item.ai_option;
+            item.selected = { ...item.ai_option };
         } else {
-            item.selected = item.db_options[parseInt(optionIndex)];
+            item.selected = { ...item.db_options[parseInt(optionIndex)] };
         }
         
         item.portionMultiplier = item.portionMultiplier || 1;
-        
-        renderOptions(item);
-        updatePortionDisplay();
-        updateConfirmButton();
+        renderAccordion();
     };
     
-    window.selectItem = selectItem;
+    window.updatePortion = function(index, value) {
+        const item = items[index];
+        let val = parseFloat(value);
+        if (isNaN(val) || val < 0.1) val = 0.1;
+        if (val > 10) val = 10;
+        item.portionMultiplier = val;
+        renderAccordion();
+    };
     
-    portionSlider.addEventListener('input', function() {
-        const item = items[currentItemIndex];
-        item.portionMultiplier = parseFloat(this.value);
-        updatePortionDisplay();
-    });
-    
-    portionInput.addEventListener('input', function() {
-        const item = items[currentItemIndex];
-        if (!item || !item.selected) return;
+    window.updatePortionFromSlider = function(index, value) {
+        const item = items[index];
+        item.portionMultiplier = parseFloat(value);
         
-        let value = parseFloat(this.value);
-        if (isNaN(value) || value < 0.1) value = 0.1;
-        if (value > 10) value = 10;
+        const input = document.getElementById(`portion-input-${index}`);
+        const grams = document.getElementById(`grams-${index}`);
+        if (input) input.value = item.portionMultiplier.toFixed(1);
+        if (grams && item.selected) {
+            grams.textContent = `~${Math.round(item.selected.grams_per_unit * item.portionMultiplier)} grams`;
+        }
         
-        item.portionMultiplier = value;
-        
-        const grams = Math.round(item.selected.grams_per_unit * value);
-        portionGrams.textContent = `~${grams} grams`;
-        portionSlider.value = Math.min(value, 4);
-        
-        sizeButtons.forEach(btn => {
-            const size = parseFloat(btn.dataset.size);
-            if (Math.abs(size - value) < 0.1) {
+        document.querySelectorAll(`.size-btn-${index}`).forEach(btn => {
+            const size = parseFloat(btn.textContent === 'Small' ? 0.5 : btn.textContent === 'Medium' ? 1 : 1.5);
+            if (Math.abs(size - item.portionMultiplier) < 0.1) {
                 btn.classList.remove('bg-[#2c2348]', 'text-white/60');
                 btn.classList.add('bg-primary', 'text-white');
             } else {
@@ -389,120 +333,92 @@ document.addEventListener('DOMContentLoaded', function() {
                 btn.classList.add('bg-[#2c2348]', 'text-white/60');
             }
         });
-    });
+    };
     
-    portionInput.addEventListener('blur', function() {
-        const item = items[currentItemIndex];
-        if (!item || !item.selected) return;
-        
-        let value = parseFloat(this.value);
-        if (isNaN(value) || value < 0.1) value = 0.1;
-        if (value > 10) value = 10;
-        this.value = value.toFixed(1);
-        item.portionMultiplier = value;
-    });
+    window.setPortionSize = function(index, size) {
+        const item = items[index];
+        item.portionMultiplier = size;
+        renderAccordion();
+    };
     
-    sizeButtons.forEach(btn => {
-        btn.addEventListener('click', function() {
-            const size = parseFloat(this.dataset.size);
-            const item = items[currentItemIndex];
-            item.portionMultiplier = size;
-            portionSlider.value = size;
-            updatePortionDisplay();
-        });
-    });
-    
-    function updateConfirmButton() {
-        const allConfirmed = items.every(item => item.confirmed);
-        const currentItem = items[currentItemIndex];
+    window.confirmItem = function(index) {
+        const item = items[index];
+        if (!item.selected) return;
         
-        if (allConfirmed) {
-            confirmBtnText.textContent = 'Calculate Glycemic Load';
-        } else if (currentItem.selected) {
-            confirmBtnText.textContent = 'Confirm & Next';
-        } else {
-            confirmBtnText.textContent = 'Select an option first';
-        }
-        
-        confirmBtn.disabled = !currentItem.selected;
-    }
-    
-    confirmBtn.addEventListener('click', async function() {
-        const item = items[currentItemIndex];
-        
-        if (!item.selected) {
-            errorDiv.textContent = 'Please select a food type first.';
-            errorDiv.classList.remove('hidden');
-            return;
-        }
-        
-        errorDiv.classList.add('hidden');
         item.confirmed = true;
         item.portionMultiplier = item.portionMultiplier || 1;
         
-        const allConfirmed = items.every(i => i.confirmed);
-        
-        if (allConfirmed) {
-            confirmBtn.disabled = true;
-            confirmBtnText.classList.add('hidden');
-            confirmBtnArrow.classList.add('hidden');
-            confirmBtnLoading.classList.remove('hidden');
-            
-            const mealItems = items.map(i => ({
-                food: i.selected.name,
-                quantity: i.quantity * i.portionMultiplier,
-                gi: i.selected.gi,
-                unit: i.selected.unit,
-                grams: Math.round(i.selected.grams_per_unit * i.portionMultiplier),
-                carbs_per_unit: i.selected.carbs_per_unit,
-                fiber_per_unit: i.selected.fiber_per_unit,
-                source: i.selected.source
-            }));
-            
-            try {
-                const response = await fetch('/calculate-gl', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + token
-                    },
-                    body: JSON.stringify({ meal: mealItems })
-                });
-                
-                const data = await response.json();
-                
-                if (response.ok) {
-                    localStorage.setItem('glResult', JSON.stringify(data));
-                    localStorage.removeItem('parsedMeal');
-                    window.location.href = '/results';
-                    return;
-                } else {
-                    errorDiv.textContent = data.message || 'Failed to calculate glycemic load.';
-                    errorDiv.classList.remove('hidden');
-                }
-            } catch (error) {
-                errorDiv.textContent = 'Network error. Please try again.';
-                errorDiv.classList.remove('hidden');
-            } finally {
-                confirmBtn.disabled = false;
-                confirmBtnText.classList.remove('hidden');
-                confirmBtnArrow.classList.remove('hidden');
-                confirmBtnLoading.classList.add('hidden');
-            }
+        const nextUnconfirmed = items.findIndex((i, idx) => idx > index && !i.confirmed);
+        if (nextUnconfirmed !== -1) {
+            expandedIndex = nextUnconfirmed;
         } else {
-            const nextUnconfirmed = items.findIndex((i, idx) => idx > currentItemIndex && !i.confirmed);
-            if (nextUnconfirmed !== -1) {
-                selectItem(nextUnconfirmed);
+            const firstUnconfirmed = items.findIndex(i => !i.confirmed);
+            if (firstUnconfirmed !== -1) {
+                expandedIndex = firstUnconfirmed;
             } else {
-                const firstUnconfirmed = items.findIndex(i => !i.confirmed);
-                if (firstUnconfirmed !== -1) {
-                    selectItem(firstUnconfirmed);
-                }
+                expandedIndex = -1;
             }
         }
         
-        renderFoodList();
-        updateConfirmButton();
+        renderAccordion();
+    };
+    
+    function updateCalculateButton() {
+        const allConfirmed = items.every(item => item.confirmed);
+        if (allConfirmed) {
+            calculateBtn.classList.remove('hidden');
+        } else {
+            calculateBtn.classList.add('hidden');
+        }
+    }
+    
+    calculateBtn.addEventListener('click', async function() {
+        calculateBtn.disabled = true;
+        calculateBtnText.classList.add('hidden');
+        calculateBtnArrow.classList.add('hidden');
+        calculateBtnLoading.classList.remove('hidden');
+        
+        const mealItems = items.map(i => ({
+            food: i.selected.name,
+            quantity: i.quantity * i.portionMultiplier,
+            gi: i.selected.gi,
+            unit: i.selected.unit,
+            grams: Math.round(i.selected.grams_per_unit * i.portionMultiplier),
+            carbs_per_unit: i.selected.carbs_per_unit,
+            fiber_per_unit: i.selected.fiber_per_unit,
+            source: i.selected.source
+        }));
+        
+        try {
+            const response = await fetch('/calculate-gl', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                },
+                body: JSON.stringify({ meal: mealItems })
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+                localStorage.setItem('glResult', JSON.stringify(data));
+                localStorage.removeItem('parsedMeal');
+                window.location.href = '/results';
+                return;
+            } else {
+                errorDiv.textContent = data.message || 'Failed to calculate glycemic load.';
+                errorDiv.classList.remove('hidden');
+            }
+        } catch (error) {
+            errorDiv.textContent = 'Network error. Please try again.';
+            errorDiv.classList.remove('hidden');
+        } finally {
+            calculateBtn.disabled = false;
+            calculateBtnText.classList.remove('hidden');
+            calculateBtnArrow.classList.remove('hidden');
+            calculateBtnLoading.classList.add('hidden');
+        }
     });
     
     document.getElementById('logout-btn').addEventListener('click', function() {
@@ -510,15 +426,7 @@ document.addEventListener('DOMContentLoaded', function() {
         window.location.href = '/login';
     });
     
-    const firstUnconfirmed = items.findIndex(i => !i.confirmed);
-    if (firstUnconfirmed !== -1) {
-        selectItem(firstUnconfirmed);
-    } else {
-        selectItem(0);
-    }
-    
-    renderFoodList();
-    updateConfirmButton();
+    renderAccordion();
 });
 </script>
 {% endblock %}
