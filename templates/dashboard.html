@@ -30,6 +30,51 @@
 </div>
 
 <div class="relative z-10 w-full max-w-[540px] mx-auto flex flex-col gap-6">
+    <div id="onboarding-cards" class="hidden flex flex-col gap-3">
+        <div id="onboarding-card-1" class="onboarding-card bg-gradient-to-r from-primary/20 to-blue-500/20 backdrop-blur-md border border-primary/30 rounded-2xl p-4 relative">
+            <button onclick="dismissOnboardingCard(1)" class="absolute top-3 right-3 text-white/50 hover:text-white">
+                <span class="material-symbols-outlined text-lg">close</span>
+            </button>
+            <div class="flex items-start gap-3">
+                <div class="p-2 rounded-lg bg-primary/20 text-primary shrink-0">
+                    <span class="material-symbols-outlined">lightbulb</span>
+                </div>
+                <div>
+                    <h3 class="text-white font-bold text-sm mb-1">What is Glycemic Load?</h3>
+                    <p class="text-white/70 text-xs leading-relaxed">It measures how much a food will raise your blood sugar. Unlike Glycemic Index, GL considers portion size too - so it's more accurate for real meals.</p>
+                </div>
+            </div>
+        </div>
+        <div id="onboarding-card-2" class="onboarding-card hidden bg-gradient-to-r from-green-500/20 to-teal-500/20 backdrop-blur-md border border-green-500/30 rounded-2xl p-4 relative">
+            <button onclick="dismissOnboardingCard(2)" class="absolute top-3 right-3 text-white/50 hover:text-white">
+                <span class="material-symbols-outlined text-lg">close</span>
+            </button>
+            <div class="flex items-start gap-3">
+                <div class="p-2 rounded-lg bg-green-500/20 text-green-400 shrink-0">
+                    <span class="material-symbols-outlined">favorite</span>
+                </div>
+                <div>
+                    <h3 class="text-white font-bold text-sm mb-1">Why Track GL?</h3>
+                    <p class="text-white/70 text-xs leading-relaxed">Stable blood sugar = steady energy, fewer cravings, and better focus. High GL meals cause energy crashes. Aim for GL 10 or less per meal.</p>
+                </div>
+            </div>
+        </div>
+        <div id="onboarding-card-3" class="onboarding-card hidden bg-gradient-to-r from-yellow-500/20 to-orange-500/20 backdrop-blur-md border border-yellow-500/30 rounded-2xl p-4 relative">
+            <button onclick="dismissOnboardingCard(3)" class="absolute top-3 right-3 text-white/50 hover:text-white">
+                <span class="material-symbols-outlined text-lg">close</span>
+            </button>
+            <div class="flex items-start gap-3">
+                <div class="p-2 rounded-lg bg-yellow-500/20 text-yellow-400 shrink-0">
+                    <span class="material-symbols-outlined">emoji_objects</span>
+                </div>
+                <div>
+                    <h3 class="text-white font-bold text-sm mb-1">How to Use</h3>
+                    <p class="text-white/70 text-xs leading-relaxed">Just type what you ate in plain language. I'll identify foods from our Indian food database or use AI for other items. You'll get personalized tips!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="w-full flex items-center justify-between bg-white/60 dark:bg-[#1e1730]/60 backdrop-blur-md border border-gray-200 dark:border-[#3f3267] rounded-3xl p-4 shadow-lg shadow-indigo-500/5 relative overflow-hidden animate-float transition-transform hover:scale-[1.02] duration-300">
         <div class="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none"></div>
         <div class="flex flex-col gap-1 relative z-10">
@@ -122,12 +167,30 @@
 
 {% block scripts %}
 <script>
+function dismissOnboardingCard(cardNum) {
+    const card = document.getElementById('onboarding-card-' + cardNum);
+    if (card) card.classList.add('hidden');
+    
+    const nextCard = document.getElementById('onboarding-card-' + (cardNum + 1));
+    if (nextCard) {
+        nextCard.classList.remove('hidden');
+    } else {
+        document.getElementById('onboarding-cards').classList.add('hidden');
+        localStorage.setItem('onboardingComplete', 'true');
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const token = localStorage.getItem('token');
     
     if (!token) {
         window.location.href = '/login';
         return;
+    }
+    
+    const onboardingComplete = localStorage.getItem('onboardingComplete');
+    if (!onboardingComplete) {
+        document.getElementById('onboarding-cards').classList.remove('hidden');
     }
     
     const mealInput = document.getElementById('meal-input');

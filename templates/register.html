@@ -119,10 +119,65 @@
         </div>
     </div>
 </div>
+
+<div class="w-full max-w-[1200px] mt-12">
+    <div class="bg-white/5 dark:bg-surface-dark/30 backdrop-blur-sm border border-white/10 rounded-2xl overflow-hidden">
+        <button onclick="toggleGlInfo()" class="w-full flex items-center justify-between p-5 hover:bg-white/5 transition-colors">
+            <div class="flex items-center gap-3">
+                <div class="p-2 rounded-lg bg-primary/10 text-primary">
+                    <span class="material-symbols-outlined">help</span>
+                </div>
+                <span class="text-gray-900 dark:text-white font-bold">What is Glycemic Load?</span>
+            </div>
+            <span id="gl-info-arrow" class="material-symbols-outlined text-gray-400 dark:text-white/50 transition-transform">expand_more</span>
+        </button>
+        <div id="gl-info-content" class="hidden px-5 pb-5">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+                <div class="bg-white/5 dark:bg-white/5 rounded-xl p-4 border border-white/10">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="material-symbols-outlined text-primary text-lg">speed</span>
+                        <h4 class="font-bold text-gray-900 dark:text-white text-sm">GI vs GL</h4>
+                    </div>
+                    <p class="text-gray-600 dark:text-text-dim text-xs leading-relaxed">
+                        <strong class="text-gray-900 dark:text-white">Glycemic Index (GI)</strong> measures how fast a food raises blood sugar. 
+                        <strong class="text-gray-900 dark:text-white">Glycemic Load (GL)</strong> considers both speed AND quantity you eat - giving a complete picture.
+                    </p>
+                </div>
+                <div class="bg-white/5 dark:bg-white/5 rounded-xl p-4 border border-white/10">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="material-symbols-outlined text-green-400 text-lg">favorite</span>
+                        <h4 class="font-bold text-gray-900 dark:text-white text-sm">Why Track GL?</h4>
+                    </div>
+                    <p class="text-gray-600 dark:text-text-dim text-xs leading-relaxed">
+                        Steady blood sugar means stable energy, better focus, and easier weight management. High GL meals cause energy crashes and cravings.
+                    </p>
+                </div>
+                <div class="bg-white/5 dark:bg-white/5 rounded-xl p-4 border border-white/10">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="material-symbols-outlined text-yellow-400 text-lg">analytics</span>
+                        <h4 class="font-bold text-gray-900 dark:text-white text-sm">The Scale</h4>
+                    </div>
+                    <p class="text-gray-600 dark:text-text-dim text-xs leading-relaxed">
+                        <span class="text-green-400 font-bold">Low (0-10):</span> Minimal impact<br/>
+                        <span class="text-yellow-400 font-bold">Moderate (11-19):</span> Some impact<br/>
+                        <span class="text-red-400 font-bold">High (20+):</span> Significant spike
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
 <script>
+function toggleGlInfo() {
+    const content = document.getElementById('gl-info-content');
+    const arrow = document.getElementById('gl-info-arrow');
+    content.classList.toggle('hidden');
+    arrow.classList.toggle('rotate-180');
+}
+
 // Set form load timestamp on page load (for anti-bot timing check)
 document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('form-timestamp').value = Date.now().toString();

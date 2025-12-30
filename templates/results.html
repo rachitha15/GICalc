@@ -88,6 +88,31 @@
                 <p class="text-white/70">Your meal has a low glycemic impact. Keep making healthy choices!</p>
             </div>
 
+            <div class="bg-[#1a1429]/50 backdrop-blur-md rounded-2xl p-5 border border-white/5">
+                <div class="flex items-center gap-2 mb-4">
+                    <span class="material-symbols-outlined text-primary text-lg">info</span>
+                    <h4 class="font-bold text-white text-sm">Understanding Your GL Score</h4>
+                </div>
+                <div class="grid grid-cols-3 gap-3">
+                    <div class="bg-green-500/10 border border-green-500/20 rounded-xl p-3 text-center">
+                        <div class="text-2xl font-bold text-green-400 mb-1">0-10</div>
+                        <div class="text-[10px] font-bold uppercase tracking-wider text-green-400/80">Low</div>
+                        <p class="text-white/50 text-[10px] mt-1 leading-tight">Minimal blood sugar impact</p>
+                    </div>
+                    <div class="bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-3 text-center">
+                        <div class="text-2xl font-bold text-yellow-400 mb-1">11-19</div>
+                        <div class="text-[10px] font-bold uppercase tracking-wider text-yellow-400/80">Moderate</div>
+                        <p class="text-white/50 text-[10px] mt-1 leading-tight">Some impact, room to improve</p>
+                    </div>
+                    <div class="bg-red-500/10 border border-red-500/20 rounded-xl p-3 text-center">
+                        <div class="text-2xl font-bold text-red-400 mb-1">20+</div>
+                        <div class="text-[10px] font-bold uppercase tracking-wider text-red-400/80">High</div>
+                        <p class="text-white/50 text-[10px] mt-1 leading-tight">Significant sugar spike</p>
+                    </div>
+                </div>
+                <p id="gl-interpretation" class="text-white/60 text-xs mt-4 leading-relaxed"></p>
+            </div>
+
             <div>
                 <h3 class="text-xl font-bold mb-4 flex items-center gap-3 px-1 text-white">
                     <span class="material-symbols-outlined text-primary">pie_chart</span>
@@ -201,6 +226,8 @@ document.addEventListener('DOMContentLoaded', function() {
         glRingProgress.style.strokeDashoffset = offset;
     }, 100);
     
+    const glInterpretation = document.getElementById('gl-interpretation');
+    
     if (totalGl <= 10) {
         glRingProgress.classList.remove('gl-medium', 'gl-high');
         glRingProgress.classList.add('gl-low');
@@ -211,6 +238,7 @@ document.addEventListener('DOMContentLoaded', function() {
         glZoneDescription.textContent = 'Excellent! This meal has minimal impact on blood sugar levels. Perfect for maintaining stable energy throughout the day.';
         successMessage.classList.remove('hidden');
         totalGlValue.classList.add('text-green-400');
+        glInterpretation.innerHTML = '<strong class="text-green-400">Your meal is in the optimal range!</strong> Low GL meals help maintain steady energy, reduce cravings, and support healthy metabolism. Keep up the great choices!';
     } else if (totalGl <= 19) {
         glRingProgress.classList.remove('gl-low', 'gl-high');
         glRingProgress.classList.add('gl-medium');
@@ -221,6 +249,7 @@ document.addEventListener('DOMContentLoaded', function() {
         glZoneDescription.textContent = 'This meal has a moderate impact on blood sugar. Consider the suggestions below to optimize your meal.';
         aiRecommendations.classList.remove('hidden');
         totalGlValue.classList.add('text-yellow-400');
+        glInterpretation.innerHTML = '<strong class="text-yellow-400">Tip:</strong> Try adding fiber (vegetables, dal) or protein to slow glucose absorption. Smaller portions of high-GI items like rice can also help.';
     } else {
         glRingProgress.classList.remove('gl-low', 'gl-medium');
         glRingProgress.classList.add('gl-high');
@@ -231,6 +260,7 @@ document.addEventListener('DOMContentLoaded', function() {
         glZoneDescription.textContent = 'This meal has a significant impact on blood sugar (GL ≥ 20). The high proportion of simple carbohydrates is driving the spike.';
         aiRecommendations.classList.remove('hidden');
         totalGlValue.classList.add('text-red-400');
+        glInterpretation.innerHTML = '<strong class="text-red-400">What this means:</strong> Your blood sugar will spike quickly, followed by a crash. This can cause fatigue, hunger, and cravings. Check the AI recommendations above for easy swaps!';
     }
     
     const breakdownList = document.getElementById('breakdown-list');
